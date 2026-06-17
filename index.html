@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<const hLogo
+  726
+!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -719,14 +721,17 @@ function renderEnvivo(sum){
   const el=document.getElementById('vEnvivo'); if(!el) return;
   const comp=sum&&sum.header&&sum.header.competitions&&sum.header.competitions[0];
   if(!comp){ el.innerHTML=`<div class="lv-wrap"><div class="lv-status" id="lv-status"></div><div class="lv-empty">No hay detalles disponibles del partido.</div></div>`; return; }
-
+728
   const cs=comp.competitors||[];
   const home=cs.find(c=>c.homeAway==='home')||cs[0]||{};
   const away=cs.find(c=>c.homeAway==='away')||cs[1]||{};
   const hName=(home.team&&(home.team.displayName||home.team.name))||'';
   const aName=(away.team&&(away.team.displayName||away.team.name))||'';
-  const hLogo=(home.team&&home.team.logos&&home.team.logos[0]&&home.team.logos[0].href)||(home.team&&home.team.logo)||'';
-  const aLogo=(away.team&&away.team.logos&&away.team.logos[0]&&away.team.logos[0].href)||(away.team&&away.team.logo)||'';
+  // ESPN logos may be missing, so fallback to flagcdn
+  let hLogo=(home.team&&home.team.logos&&home.team.logos[0]&&home.team.logos[0].href)||(home.team&&home.team.logo)||'';
+  let aLogo=(away.team&&away.team.logos&&away.team.logos[0]&&away.team.logos[0].href)||(away.team&&away.team.logo)||'';
+  if(!hLogo) hLogo=lvFlag(hName);
+  if(!aLogo) aLogo=lvFlag(aName);
   const hScore=home.score!=null?home.score:'0';
   const aScore=away.score!=null?away.score:'0';
   const st=comp.status||(sum.header&&sum.header.status)||{};
