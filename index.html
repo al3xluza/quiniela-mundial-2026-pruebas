@@ -799,15 +799,14 @@ function renderEnvivo(sum){
         const player=(k.participants?.[0]?.athlete?.displayName)||k.text||'';
         
         // Integración de flagImg() para bandera del equipo
-        const teamFlag=k.team ? flagImg(k.team.displayName||k.team.name) : '';
-        
+const teamFlag=k.team ? lvFlag(k.team.displayName||k.team.name) : '';        
         h+=`<div class="lv-event"><span class="lv-ev-min">${min}</span>${teamFlag}<span class="lv-ev-ico">${ico}</span><span>${player}</span></div>`;
       });
       h+=`</div>`;
     }
   }
 
-  // ===== MUESTREO 2: ESTADÍSTICAS + REPORTE OFICIAL (solo en breaks) =====
+  // ===== MUESTREO  ESTADÍSTICAS + REPORTE OFICIAL (solo en breaks) =====
   if(isBreak){
     const hStats=(home.statistics||[]);
     const aStats=(away.statistics||[]);
