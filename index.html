@@ -804,38 +804,56 @@ async function refreshEnvivo(){
   }
 }
 
-// Comprueba si hay partido en vivo y muestra/oculta el tab.
+// Comprueba si hay partido en vivo y asegura que el tab sea visible si hay actividad
 async function checkEnvivo(){
-  const tabBtn=document.getElementById('tab-envivo');
+  const tabBtn = document.getElementById('tab-envivo');
   try{
-    const ev=await findLiveEvent();
-    const sum = ev ? await fetchSummary(ev.id) : null;
-    const isPost = sum && sum.header.status.type.state === 'post';
+    const ev = await findLiveEvent();
+    
+    // Obtenemos el resumen solo si existe un evento
+    let sum = null;
+    if(ev) {
+        sum = await fetchSummary(ev.id);
+    }
+    
+    // Determinamos si el partido está en vivo o recién finalizado
+    const isLive = ev != null;
+    const isPost = sum && sum.header && sum.header.status && sum.header.status.type && sum.header.status.type.state === 'post';
 
-    if(ev || isPost){
-      ENVIVO_EVENT=ev ? ev.id : ENVIVO_EVENT;
-      if(!ENVIVO_ACTIVE){
-        ENVIVO_ACTIVE=true;
-        tabBtn.style.display='';
-        if(ENVIVO_TIMER) clearInterval(ENVIVO_TIMER);
-        ENVIVO_TIMER=setInterval(refreshEnvivo, 30*1000);
-      }
-      renderEnvivo(sum);
+    // Si hay evento en vivo O recién finalizado, mostramos el tab
+    if(isLive || isPost){
+      ENVIVO_EVENT = ev ? ev.id : ENVIVO_EVENT;
       
-      // Si el partido terminó, programamos el cierre del tab en 10 min
+      // Aseguramos que el botón sea visible
+      tabBtn.style.display = '';
+      
+      if(!ENVIVO_ACTIVE){
+        ENVIVO_ACTIVE = true;
+        if(ENVIVO_TIMER) clearInterval(ENVIVO_TIMER);
+        ENVIVO_TIMER = setInterval(refreshEnvivo, 30 * 1000);
+      }
+      
+      // Renderizamos con el resumen disponible
+      if(sum) renderEnvivo(sum);
+      
+      // Si el partido finalizó, programamos el cierre del tab en 10 min
       if(isPost && !tabBtn.dataset.timer){
         tabBtn.dataset.timer = setTimeout(() => {
-          tabBtn.style.display='none';
+          tabBtn.style.display = 'none';
           tabBtn.dataset.timer = '';
+          // Regresamos al inicio si el usuario estaba viendo el tab
           if(tabBtn.classList.contains('active')) document.getElementById('tab-tabla').click();
-        }, 10 * 60 * 1000);
+        }, 10 * 60 * 1000); // 10 minutos
       }
     } else {
-      ENVIVO_EVENT=null; ENVIVO_ACTIVE=false; tabBtn.style.display='none';
-      if(ENVIVO_TIMER){ clearInterval(ENVIVO_TIMER); ENVIVO_TIMER=null; }
-      if(tabBtn.classList.contains('active')) document.getElementById('tab-tabla').click();
+      // Si no hay nada, ocultamos
+      ENVIVO_ACTIVE = false;
+      tabBtn.style.display = 'none';
+      if(ENVIVO_TIMER){ clearInterval(ENVIVO_TIMER); ENVIVO_TIMER = null; }
     }
-  }catch(e){ console.error('Envivo check error:',e); }
+  } catch(e) { 
+    console.error('Error crítico en checkEnvivo:', e); 
+  }
 }
 
 // Chequeo inicial y cada 60 s (ligero: solo el scoreboard).
