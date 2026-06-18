@@ -212,6 +212,9 @@ input[type="number"] {
 .lv-bar .a{background:var(--grass)}
 .lv-bar .b{background:var(--gold)}
 .lv-xi{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.lv-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.lv-cols.solo{grid-template-columns:1fr}
+@media (max-width:640px){.lv-cols{grid-template-columns:1fr;gap:10px}}
 .lv-xi-col h5{font-family:'Saira Condensed';font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:rgba(239,245,240,.7);margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .lv-xi-col h5 img{width:18px;height:18px;border-radius:50%;object-fit:cover}
 .lv-xi-p{font-size:12px;padding:3px 0;color:rgba(239,245,240,.82);display:flex;gap:6px}
@@ -837,12 +840,13 @@ function renderEnvivo(sum){
         <div class="lv-tm">${aLogo?`<img src="${aLogo}" alt="">`:''}<div class="lv-tm-name">${aName}</div></div>
       </div>`;
 
-  // ===== MUESTREO 1: JUGADAS CLAVE (solo cuando NO es break) =====
- if(!isBreak){
+  // ===== JUGADAS CLAVE (siempre que existan; va en columna izquierda) =====
+  let colEventos='';
+  {
     const keyEvents = getLiveKeyEvents(sum, comp);
     
 if(keyEvents.length){
-      h+=`<div class="lv-section"><h4>Jugadas Clave</h4>`;
+      colEventos+=`<div class="lv-section"><h4>Jugadas Clave</h4>`;
       keyEvents.forEach(k=>{
 
         const txt = (
@@ -919,7 +923,7 @@ if(keyEvents.length){
       
       if(!descriptionRaw.trim()) return;
       
-      h+=`<div class="lv-event">
+      colEventos+=`<div class="lv-event">
         <span class="lv-ev-min">${min}</span>
         ${teamFlag ? `<img src="${teamFlag}" class="flag" alt="">` : ''}
         <span class="lv-ev-ico">${ico}</span>
@@ -928,12 +932,14 @@ if(keyEvents.length){
             
       
       });
-      h+=`</div>`;
+      colEventos+=`</div>`;
     }
   }
 
-  // ===== MUESTREO  ESTADÍSTICAS + REPORTE OFICIAL (solo en breaks) =====
+  // ===== ESTADÍSTICAS (siempre que existan; va en columna derecha) =====
   // ESPN pone las stats en boxscore.teams[], no en competitors[].statistics
+  let colStats='';
+  {
     const bsTeams=(sum.boxscore?.teams||[]);
     const bsHome=bsTeams.find(t=>t.homeAway==='home')||bsTeams[0]||{};
     const bsAway=bsTeams.find(t=>t.homeAway==='away')||bsTeams[1]||{};
@@ -970,18 +976,21 @@ if(keyEvents.length){
         </div>`;
       });
       
-      // Mostrar "Reporte Oficial" durante breaks (en lugar de "Estadísticas")
+      // Rótulo según estado del partido
       if(rows){
-        const reportTitle=isFinal?'Estadísticas Finales':`Reporte Oficial (Min. ${currentMin}')`;
-        h+=`<div class="lv-section"><h4 style="color:var(--gold)">${reportTitle}</h4>${rows}</div>`;
+        const reportTitle=isFinal?'Estadísticas Finales':(isBreak?`Reporte Oficial (Min. ${currentMin}')`:`Estadísticas en vivo${currentMin?` (Min. ${currentMin}')`:''}`);
+        colStats+=`<div class="lv-section"><h4 style="color:var(--gold)">${reportTitle}</h4>${rows}</div>`;
       }
-    } else {
-      // FALLBACK: Si ESPN no envía datos de estadísticas, mostrar mensaje informativo
-      h+=`<div class="lv-section"><h4 style="color:var(--gold)">Reporte Oficial (Min. ${currentMin}')</h4>
-        <div style="text-align:center;padding:20px;color:rgba(239,245,240,.6);font-size:13px;font-style:italic">
-          Estadísticas no disponibles en ESPN para este partido
-        </div></div>`;
     }
+    // Si no hay stats, colStats queda vacío y la columna colapsa (ver ensamblaje abajo)
+  }
+
+  // ===== ENSAMBLAJE: Jugadas Clave (izq) | Estadísticas (der) =====
+  // Dos columnas en desktop, apiladas en móvil. Si una está vacía, la otra ocupa todo.
+  if(colEventos && colStats){
+    h+=`<div class="lv-cols">${colEventos}${colStats}</div>`;
+  } else if(colEventos || colStats){
+    h+=`<div class="lv-cols solo">${colEventos}${colStats}</div>`;
   }
 
   // ===== ALINEACIONES (siempre, si existen) =====
