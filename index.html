@@ -188,7 +188,7 @@ input[type="number"] {
 .lv-empty{text-align:center;color:rgba(239,245,240,.55);padding:40px 16px;font-size:14px}
 .lv-status{text-align:center;font-size:11.5px;color:rgba(239,245,240,.45);margin:4px 0 14px;min-height:14px}
 .lv-status.err{color:var(--red)}
-.lv-card{background:#1A1A1A;border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden;margin-bottom:16px}
+.lv-card{margin-bottom:16px}
 .lv-scoreboard{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:20px 16px 16px;background:linear-gradient(180deg,#5A1714 0%,#1A1A1A 120%)}
 .lv-tm{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;min-width:0}
 .lv-tm img{width:48px;height:48px;object-fit:cover;border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.15),0 2px 6px rgba(0,0,0,.5)}
@@ -215,6 +215,17 @@ input[type="number"] {
 .lv-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
 .lv-cols.solo{grid-template-columns:1fr}
 @media (max-width:640px){.lv-cols{grid-template-columns:1fr;gap:10px}}
+.lv-stat-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.1)}
+.lv-stat-head .tm{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0}
+.lv-stat-head .tm img{width:28px;height:28px;object-fit:cover;border-radius:50%;box-shadow:0 0 0 1.5px rgba(255,255,255,.15)}
+.lv-stat-head .tm-name{font-family:'Saira Condensed';font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.03em;text-align:center;line-height:1.05;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.lv-stat-head .vs{font-family:'JetBrains Mono';font-size:10px;color:rgba(239,245,240,.4);padding:0 6px}
+.lv-col-izq{display:flex;flex-direction:column}
+.lv-col-izq .lv-scoreboard{border-radius:12px 12px 0 0}
+.lv-stats-wrap{border:1px solid rgba(255,255,255,.12);border-top:none;border-radius:0 0 12px 12px;overflow:hidden}
+.lv-stats-wrap .lv-section{border-top:none}
+.lv-col-der{border:1px solid rgba(255,255,255,.12);border-radius:12px;overflow:hidden}
+.lv-col-der .lv-section{border-top:none}
 .lv-xi-col h5{font-family:'Saira Condensed';font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:rgba(239,245,240,.7);margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .lv-xi-col h5 img{width:18px;height:18px;border-radius:50%;object-fit:cover}
 .lv-xi-p{font-size:12px;padding:3px 0;color:rgba(239,245,240,.82);display:flex;gap:6px}
@@ -832,8 +843,8 @@ function renderEnvivo(sum){
   let h=`<div class="lv-wrap"><div class="lv-status" id="lv-status"></div>`;
   h+=`<div class="lv-card">`;
   
-  // SCOREBOARD (siempre visible)
-  h+=`<div class="lv-scoreboard">
+  // SCOREBOARD (encabeza la columna izquierda, junto a las estadísticas)
+  const colScoreboard=`<div class="lv-scoreboard">
         <div class="lv-tm">${hLogo?`<img src="${hLogo}" alt="">`:''}<div class="lv-tm-name">${hName}</div></div>
         <div class="lv-mid"><div class="lv-score">${hScore} - ${aScore}</div>
           <div class="lv-clock ${isFinal?'ft':''}">${isFinal?'':'<span class="livedot">●</span> '}${clockTxt}</div></div>
@@ -985,12 +996,16 @@ if(keyEvents.length){
     // Si no hay stats, colStats queda vacío y la columna colapsa (ver ensamblaje abajo)
   }
 
-  // ===== ENSAMBLAJE: Jugadas Clave (izq) | Estadísticas (der) =====
-  // Dos columnas en desktop, apiladas en móvil. Si una está vacía, la otra ocupa todo.
-  if(colEventos && colStats){
-    h+=`<div class="lv-cols">${colEventos}${colStats}</div>`;
-  } else if(colEventos || colStats){
-    h+=`<div class="lv-cols solo">${colEventos}${colStats}</div>`;
+  // ===== ENSAMBLAJE =====
+  // Columna izquierda: marcador (scoreboard) + estadísticas.
+  // Columna derecha: jugadas clave.
+  // Dos columnas en desktop, apiladas en móvil. Si la derecha está vacía, la izquierda ocupa todo.
+  const colIzq=`<div class="lv-col-izq">${colScoreboard}${colStats?`<div class="lv-stats-wrap">${colStats}</div>`:''}</div>`;
+  const colDer=colEventos?`<div class="lv-col-der">${colEventos}</div>`:'';
+  if(colDer){
+    h+=`<div class="lv-cols">${colIzq}${colDer}</div>`;
+  } else {
+    h+=`<div class="lv-cols solo">${colIzq}</div>`;
   }
 
   // ===== ALINEACIONES (siempre, si existen) =====
@@ -1014,7 +1029,7 @@ if(keyEvents.length){
       return `<div class="lv-xi-col"><h5>${logo?`<img src="${logo}" alt="">`:''}${tName}</h5>${pl}</div>`;
     };
     
-    h+=`<div class="lv-section"><h4>Alineaciones</h4><div class="lv-xi">${col(rosters[0])}${col(rosters[1])}</div></div>`;
+    h+=`<div class="lv-col-der" style="margin-top:12px"><div class="lv-section"><h4>Alineaciones</h4><div class="lv-xi">${col(rosters[0])}${col(rosters[1])}</div></div></div>`;
   }
 
   h+=`</div></div>`;
