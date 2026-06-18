@@ -714,6 +714,27 @@ function lvFlag(name){
   return iso?`https://flagcdn.com/w80/${iso}.png`:'';
 }
 
+
+function getLiveKeyEvents(sum, comp){
+  const sources = [
+    ...(sum?.keyEvents || []),
+    ...(sum?.plays || []),
+    ...(sum?.details || []),
+    ...(comp?.details || [])
+  ];
+
+  return sources.filter(e=>{
+    const txt =
+      e.text ||
+      e.displayText ||
+      e.shortText ||
+      e.type?.text ||
+      e.type?.description ||
+      '';
+
+    return String(txt).trim().length > 0;
+  });
+}
   
 // ========== renderEnvivo: Muestreo Estratégico con Validación Segura ==========
 // Renderiza la tarjeta del partido en vivo con lógica de muestreo estratégico:
@@ -781,18 +802,27 @@ function renderEnvivo(sum){
       </div>`;
 
   // ===== MUESTREO 1: JUGADAS CLAVE (solo cuando NO es break) =====
-  if(!isBreak){
-    const keyEvents=(sum.keyEvents||[]).filter(k=>{
-      // Validación segura: requiere jugador o texto válido
-      const player=(k.participants?.[0]?.athlete?.displayName)||k.text||'';
-      return player&&player.trim().length>0;
-    });
+ if(!isBreak){
+    const keyEvents = getLiveKeyEvents(sum, comp);
     
-    if(keyEvents.length){
+if(keyEvents.length){
       h+=`<div class="lv-section"><h4>Jugadas Clave</h4>`;
       keyEvents.forEach(k=>{
-        const txt=(k.text||'').toLowerCase();
-        const typeId=(k.type?.id)||'';
+
+        const txt = (
+          k.text ||
+          k.displayText ||
+          k.shortText ||
+          k.type?.text ||
+          k.type?.description ||
+          ''
+        ).toLowerCase();
+
+        const typeId = (
+          k.type?.id ||
+          k.type?.name ||
+          ''
+        );
         
         // Iconografía robusta (covers ESPN naming variations)
         //let ico='•';
@@ -810,8 +840,20 @@ function renderEnvivo(sum){
         else if(/red|roja/.test(txt)||/red/i.test(typeId)){ ico='🟥'; esTipo='Tarjeta roja'; }
         else if(/penalty|penal/.test(txt)){ ico='🎯'; esTipo='Penal'; }
                 
-        const min=k.clock?.displayValue||(k.time||'');
-        const player=(k.participants?.[0]?.athlete?.displayName)||k.text||'';
+        const min =
+          k.clock?.displayValue ||
+          k.time?.displayValue ||
+          k.time ||
+          k.minute ||
+          '';
+        
+        const player =
+          k.participants?.[0]?.athlete?.displayName ||
+          k.athlete?.displayName ||
+          k.text ||
+          k.displayText ||
+          k.shortText ||
+          '';
         
         // Integración de flagImg() para bandera del equipo
 const teamFlag=k.team ? lvFlag(k.team.displayName||k.team.name) : '';        
