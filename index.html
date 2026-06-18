@@ -933,9 +933,12 @@ if(keyEvents.length){
   }
 
   // ===== MUESTREO  ESTADÍSTICAS + REPORTE OFICIAL (solo en breaks) =====
-  if(isBreak){
-    const hStats=(home.statistics||[]);
-    const aStats=(away.statistics||[]);
+  // ESPN pone las stats en boxscore.teams[], no en competitors[].statistics
+    const bsTeams=(sum.boxscore?.teams||[]);
+    const bsHome=bsTeams.find(t=>t.homeAway==='home')||bsTeams[0]||{};
+    const bsAway=bsTeams.find(t=>t.homeAway==='away')||bsTeams[1]||{};
+    const hStats=(bsHome.statistics||home.statistics||[]);
+    const aStats=(bsAway.statistics||away.statistics||[]);
     
     // Validación: ambos teams deben tener datos estadísticos
     if(hStats?.length&&aStats?.length){
