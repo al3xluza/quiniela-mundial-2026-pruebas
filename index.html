@@ -944,14 +944,18 @@ if(keyEvents.length){
       
       // Mejorar descripción de pausas/delays
       let description = descriptionRaw;
-      if(/^start delay/i.test(description)) description = '💧 Hydration Break';
-      else if(/^end delay/i.test(description)) description = '💧 Hydration Break End';
+      let isHydrationBreak = false;
+      if(/^start delay/i.test(description)) { description = '💧 Hydration Break'; isHydrationBreak = true; }
+      else if(/^end delay/i.test(description)) { description = '💧 Hydration Break End'; isHydrationBreak = true; }
       
       if(!description.trim()) return;
       
+      // No mostrar bandera en pausas de hidratación
+      const flagHtml = !isHydrationBreak && teamFlag ? `<img src="${teamFlag}" class="flag" alt="">` : '';
+      
       colEventos+=`<div class="lv-event">
         <span class="lv-ev-min">${min}</span>
-        ${teamFlag ? `<img src="${teamFlag}" class="flag" alt="">` : ''}
+        ${flagHtml}
         <span class="lv-ev-ico">${ico}</span>
         <span>${description}</span>
       </div>`;
