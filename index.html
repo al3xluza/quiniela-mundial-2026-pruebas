@@ -743,40 +743,196 @@ function renderInstrucciones(){
         </tr>
         <tr style="border-bottom:1px solid var(--line)">
           <td style="padding:8px">1</td>
-          <td style="padding:8px">Pegar resultado exacto (con ganador o empate)</td>
-          <td style="padding:8px;text-align:center;color:var(--ok);font-weight:700">7</td>
+          <td style="padding:8px">Pegar resultado exacto (con ganador o empate) <br><span style="font-size:10px;color:rgba(255,255,255,.6)">Ver Ejemplo 1.A y 1.B</span></td>
+          <td style="padding:8px;text-align:center;color:#FFFFFF;font-weight:700">7</td>
         </tr>
         <tr style="border-bottom:1px solid var(--line)">
           <td style="padding:8px">2</td>
-          <td style="padding:8px">Pegar ganador o empate sin resultado exacto</td>
-          <td style="padding:8px;text-align:center;color:var(--gold);font-weight:700">3</td>
+          <td style="padding:8px">Pegar ganador o empate sin resultado exacto <br><span style="font-size:10px;color:rgba(255,255,255,.6)">Ver Ejemplo 2.A y 2.B</span></td>
+          <td style="padding:8px;text-align:center;color:#FFFFFF;font-weight:700">3</td>
         </tr>
         <tr style="border-bottom:1px solid var(--line)">
-          <td style="padding:8px">3</td>
-          <td style="padding:8px">Pegar los goles de uno de los equipos (con o sin ganador)</td>
-          <td style="padding:8px;text-align:center;color:var(--gold);font-weight:700">4 / 1</td>
+          <td style="padding:8px">3.A</td>
+          <td style="padding:8px">Pegar los goles de uno de los equipos + equipo ganador <br><span style="font-size:10px;color:rgba(255,255,255,.6)">Ver Ejemplo 3.A</span></td>
+          <td style="padding:8px;text-align:center;color:#FFFFFF;font-weight:700">4</td>
         </tr>
         <tr style="border-bottom:1px solid var(--line)">
-          <td style="padding:8px">4</td>
-          <td style="padding:8px">Pegar los equipos en fase knockout sin resultado</td>
-          <td style="padding:8px;text-align:center;color:#8FB8A4;font-weight:700">1</td>
-        </tr>
-        <tr style="border-bottom:1px solid var(--line)">
-          <td style="padding:8px">5</td>
-          <td style="padding:8px">Pegar el equipo subcampeón</td>
-          <td style="padding:8px;text-align:center;color:var(--gold);font-weight:700">3</td>
-        </tr>
-        <tr style="border-bottom:1px solid var(--line)">
-          <td style="padding:8px">6</td>
-          <td style="padding:8px">Pegar el equipo campeón</td>
-          <td style="padding:8px;text-align:center;color:var(--gold);font-weight:700">3</td>
+          <td style="padding:8px">3.B</td>
+          <td style="padding:8px">Pegar los goles de uno de los equipos (sin ganador) <br><span style="font-size:10px;color:rgba(255,255,255,.6)">Ver Ejemplo 3.B</span></td>
+          <td style="padding:8px;text-align:center;color:#FFFFFF;font-weight:700">1</td>
         </tr>
         <tr style="border-bottom:none">
-          <td style="padding:8px">7</td>
-          <td style="padding:8px">Pegar el goleador</td>
-          <td style="padding:8px;text-align:center;color:var(--gold);font-weight:700">3</td>
+          <td style="padding:8px">4</td>
+          <td style="padding:8px">Cualquier otro resultado <br><span style="font-size:10px;color:rgba(255,255,255,.6)">Ver Ejemplo 4.A y 4.B</span></td>
+          <td style="padding:8px;text-align:center;color:#FFFFFF;font-weight:700">0</td>
         </tr>
       </table>
+      
+      <h3 style="font-family:'Saira Condensed';font-weight:700;font-size:16px;color:#FFFFFF;text-transform:uppercase;letter-spacing:.08em;margin-top:20px;margin-bottom:10px">📚 Ejemplos Prácticos de Puntuación</h3>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:15px 0">
+        <!-- CASO 1 -->
+        <div style="background:rgba(34,165,101,.1);border:1px solid rgba(34,165,101,.3);border-radius:6px;padding:12px">
+          <div style="background:rgba(34,165,101,.2);padding:6px;text-align:center;font-weight:700;font-size:13px;margin-bottom:10px;border-radius:4px">CASO 1.A - Resultado Exacto (Ganador)</div>
+          <div style="font-size:11px;line-height:1.8">
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO REAL</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">2 - 1</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO PROPUESTO</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">2 - 1</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="text-align:center;margin-top:10px;font-weight:700;font-size:13px;color:var(--ok)">✅ 7 PUNTOS</div>
+          </div>
+        </div>
+        
+        <div style="background:rgba(34,165,101,.1);border:1px solid rgba(34,165,101,.3);border-radius:6px;padding:12px">
+          <div style="background:rgba(34,165,101,.2);padding:6px;text-align:center;font-weight:700;font-size:13px;margin-bottom:10px;border-radius:4px">CASO 1.B - Resultado Exacto (Empate)</div>
+          <div style="font-size:11px;line-height:1.8">
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO REAL</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">3 - 3</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO PROPUESTO</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">3 - 3</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="text-align:center;margin-top:10px;font-weight:700;font-size:13px;color:var(--ok)">✅ 7 PUNTOS</div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:15px 0">
+        <!-- CASO 2 -->
+        <div style="background:rgba(255,193,7,.1);border:1px solid rgba(255,193,7,.3);border-radius:6px;padding:12px">
+          <div style="background:rgba(255,193,7,.2);padding:6px;text-align:center;font-weight:700;font-size:13px;margin-bottom:10px;border-radius:4px">CASO 2.A - Ganador Correcto</div>
+          <div style="font-size:11px;line-height:1.8">
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO REAL</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">2 - 1</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO PROPUESTO</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">3 - 0</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="text-align:center;margin-top:10px;font-weight:700;font-size:13px;color:var(--gold)">✅ 3 PUNTOS</div>
+          </div>
+        </div>
+        
+        <div style="background:rgba(255,193,7,.1);border:1px solid rgba(255,193,7,.3);border-radius:6px;padding:12px">
+          <div style="background:rgba(255,193,7,.2);padding:6px;text-align:center;font-weight:700;font-size:13px;margin-bottom:10px;border-radius:4px">CASO 2.B - Empate Correcto</div>
+          <div style="font-size:11px;line-height:1.8">
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO REAL</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">3 - 3</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO PROPUESTO</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">1 - 1</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="text-align:center;margin-top:10px;font-weight:700;font-size:13px;color:var(--gold)">✅ 3 PUNTOS</div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:15px 0">
+        <!-- CASO 3 -->
+        <div style="background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.3);border-radius:6px;padding:12px">
+          <div style="background:rgba(255,152,0,.2);padding:6px;text-align:center;font-weight:700;font-size:13px;margin-bottom:10px;border-radius:4px">CASO 3.A - Goles + Ganador</div>
+          <div style="font-size:11px;line-height:1.8">
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO REAL</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">2 - 1</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO PROPUESTO</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">2 - 0</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="text-align:center;margin-top:10px;font-weight:700;font-size:13px;color:var(--gold)">✅ 4 PUNTOS</div>
+          </div>
+        </div>
+        
+        <div style="background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);border-radius:6px;padding:12px">
+          <div style="background:rgba(255,107,107,.2);padding:6px;text-align:center;font-weight:700;font-size:13px;margin-bottom:10px;border-radius:4px">CASO 3.B - Goles Sin Ganador</div>
+          <div style="font-size:11px;line-height:1.8">
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO REAL</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">2 - 1</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO PROPUESTO</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">0 - 1</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="text-align:center;margin-top:10px;font-weight:700;font-size:13px;color:#FF9800">✅ 1 PUNTO</div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:15px 0">
+        <!-- CASO 4 -->
+        <div style="background:rgba(143,184,164,.1);border:1px solid rgba(143,184,164,.3);border-radius:6px;padding:12px">
+          <div style="background:rgba(143,184,164,.2);padding:6px;text-align:center;font-weight:700;font-size:13px;margin-bottom:10px;border-radius:4px">CASO 4.A - Acierto Parcial</div>
+          <div style="font-size:11px;line-height:1.8">
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO REAL</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">2 - 1</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO PROPUESTO</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">0 - 0</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="text-align:center;margin-top:10px;font-weight:700;font-size:13px;color:#8FB8A4">✅ 0 PUNTOS</div>
+          </div>
+        </div>
+        
+        <div style="background:rgba(143,184,164,.1);border:1px solid rgba(143,184,164,.3);border-radius:6px;padding:12px">
+          <div style="background:rgba(143,184,164,.2);padding:6px;text-align:center;font-weight:700;font-size:13px;margin-bottom:10px;border-radius:4px">CASO 4.B - Error Total</div>
+          <div style="font-size:11px;line-height:1.8">
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO REAL</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">3 - 3</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="color:rgba(255,255,255,.6);font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">RESULTADO PROPUESTO</div>
+            <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-bottom:10px">
+              <div style="text-align:right;font-weight:600;font-size:13px;text-transform:uppercase">México</div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;background:#05140D;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 0;color:var(--gold)">2 - 1</div>
+              <div style="font-weight:600;font-size:13px;text-transform:uppercase">Sudáfrica</div>
+            </div>
+            <div style="text-align:center;margin-top:10px;font-weight:700;font-size:13px;color:#8FB8A4">❌ 0 PUNTOS</div>
+          </div>
+        </div>
+      </div>
       
       <h3 style="font-family:'Saira Condensed';font-weight:700;font-size:16px;color:#FFFFFF;text-transform:uppercase;letter-spacing:.08em;margin-top:20px;margin-bottom:10px">🏆 Cuadro de Premiación</h3>
       <p>El pote se distribuye así:</p>
@@ -838,20 +994,6 @@ function renderInstrucciones(){
         </tr>
       </table>
       
-      <h3 style="font-family:'Saira Condensed';font-weight:700;font-size:16px;color:#FFFFFF;text-transform:uppercase;letter-spacing:.08em;margin-top:20px;margin-bottom:10px">✅ Pasos a Seguir</h3>
-      <ol style="margin-left:20px;margin-top:10px">
-        <li>Recibir vía correo el archivo de la quiniela</li>
-        <li>Leer y estar de acuerdo con el sistema de evaluación</li>
-        <li>Colocar sus resultados propuestos en las hojas de grupos (llenar solo celdas verdes)</li>
-        <li>Enviar el archivo completado al promotor antes de la fecha límite</li>
-        <li>Recibir el archivo definitivo con todos los participantes</li>
-        <li>Verificar que sus resultados sean correctos en el archivo definitivo</li>
-        <li>A medida que avance el torneo, anotar los resultados reales</li>
-        <li>Ver la puntuación actualizarse automáticamente en el archivo</li>
-        <li>Una vez finalizada la primera fase, se procede a pagar a los ganadores</li>
-      </ol>
-      
-      <p style="margin-top:20px;text-align:center;color:rgba(255,255,255,.6);font-size:12px">¡BUENA SUERTE!</p>
     </div>
   </div>`;
   
