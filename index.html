@@ -1312,11 +1312,10 @@ if(keyEvents.length){
         k.type?.description ||
         '';
       
-      // Mejorar descripción de pausas/delays
+      // Mejorar descripción de pausas de hidratación
       let description = descriptionRaw;
       let isHydrationBreak = false;
-      if(/^start delay/i.test(description)) { description = '💧 Pausa de Hidratación'; isHydrationBreak = true; }
-      else if(/^end delay/i.test(description)) { description = '💧 Fin Pausa de Hidratación'; isHydrationBreak = true; }
+      if(/drinks break/i.test(description)) { description = '💧 Pausa de Hidratación'; isHydrationBreak = true; }
       
       if(!description.trim()) return;
       
