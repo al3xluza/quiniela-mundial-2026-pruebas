@@ -1201,7 +1201,6 @@ function renderEnvivo(sum){
     stType.shortDetail && /ht|half/i.test(stType.shortDetail) ? 'Descanso' :
     st.displayClock || 'En juego'
   );
-  const currentMin=parseInt(st.displayClock?.match(/\d+/)?.[0]||0);
 
   const detail = String(stType.detail || '').toLowerCase();
   const shortDetail = String(stType.shortDetail || '').toLowerCase();
