@@ -1193,6 +1193,7 @@ function renderEnvivo(sum){
   const aScore=away.score!=null?away.score:'0';
   
   // Estado del partido y cálculo de breaks (Muestreo Estratégico)
+  const st=comp.status||(sum.header?.status)||{};
   const stType=st.type||{};
   const isFinal=stType.completed===true||stType.state==='post';
   const clockTxt=isFinal?'Final':(
