@@ -313,7 +313,7 @@ window.addEventListener('load', () => {
   
   // Restaurar estado del panel de simulación
   setTimeout(() => {
-    const panelOpen = localStorage.getItem('simulationPanelOpen') !== 'false';
+    const panelOpen = localStorage.getItem('simulationPanelOpen') === 'true';
     const panel = document.getElementById('simulationPanel');
     const btn = document.getElementById('toggleSimulation');
     if(panel && btn) {
@@ -1271,6 +1271,10 @@ if(keyEvents.length){
         else if(/yellow|amarilla/.test(txt)||/yellow/i.test(typeId)){ ico='🟨'; esTipo='Tarjeta amarilla'; }
         else if(/red|roja/.test(txt)||/red/i.test(typeId)){ ico='🟥'; esTipo='Tarjeta roja'; }
         else if(/penalty|penal/.test(txt)){ ico='🎯'; esTipo='Penal'; }
+        else if(/kickoff|start of|kick off/i.test(txt)){ ico='📯'; esTipo='Inicio'; }
+        else if(/halftime|half time|half-time|descanso/i.test(txt)){ ico='📯'; esTipo='Descanso'; }
+        else if(/second half|segundo tiempo|start of second/i.test(txt)){ ico='📯'; esTipo='Segundo tiempo'; }
+        else if(/full time|final|end of match/i.test(txt)){ ico='📯'; esTipo='Final'; }
                 
         const min =
           k.clock?.displayValue ||
@@ -1325,8 +1329,8 @@ if(keyEvents.length){
       // No mostrar bandera en pausas de hidratación
       const flagHtml = !isHydrationBreak && teamFlag ? `<img src="${teamFlag}" class="flag" alt="">` : '';
       
-      // Para Hydration Breaks, no mostrar minuto (poco confiable)
-      const minDisplay = isHydrationBreak ? '💧' : min;
+      // Mantener el minuto incluso en hidratación
+      const minDisplay = min;
       
       colEventos+=`<div class="lv-event">
         <span class="lv-ev-min">${minDisplay}</span>
