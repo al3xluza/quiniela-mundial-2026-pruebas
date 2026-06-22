@@ -1160,6 +1160,21 @@ function renderEnvivo(sum){
   const comp=sum?.header?.competitions?.[0];
   if(!comp){ el.innerHTML=`<div class="lv-wrap"><div class="lv-status" id="lv-status"></div><div class="lv-empty">No hay detalles disponibles del partido.</div></div>`; return; }
 
+  // DEBUG: Loguear datos de eventos
+  const keyEvents = getLiveKeyEvents(sum, comp);
+  const st = comp.status || (sum.header?.status) || {};
+  const currentMin = parseInt(st.displayClock?.match(/\d+/)?.[0] || 0);
+  console.log('=== QUINIELA EN VIVO DEBUG ===');
+  console.log('⏱️ Minuto Actual:', currentMin);
+  console.log('📊 Total Eventos:', keyEvents.length);
+  keyEvents.forEach((e, i) => {
+    const txt = e.text || e.displayText || e.shortText || e.type?.text || e.type?.description || '';
+    const eventMin = parseInt(e.clock?.displayValue?.match(/\d+/)?.[0] || e.minute || 0);
+    const isFuture = eventMin > currentMin;
+    console.log(`[${i}] Min: ${eventMin || '?'} | Futuro: ${isFuture ? '⚠️ SÍ' : '✓'} | ${txt.substring(0, 60)}`);
+  });
+  console.log('==============================');
+
   // Extraer competidores (home/away) con fallback seguro
   const cs=comp.competitors||[];
   const home=cs.find(c=>c.homeAway==='home')||cs[0]||{};
