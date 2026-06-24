@@ -254,7 +254,8 @@ input[type="number"] {
 
 <div class="tabs" role="tablist" aria-label="Vistas de la quiniela">
   <button class="tab active" data-v="tabla" role="tab" id="tab-tabla" aria-controls="vTabla" aria-selected="true">Posiciones</button>
-  <button class="tab tab-envivo" data-v="envivo" role="tab" id="tab-envivo" aria-controls="vEnvivo" aria-selected="false" style="display:none"><span class="livedot" style="margin-right:5px">●</span>En Vivo</button>
+  <button class="tab tab-envivo" data-v="envivo" role="tab" id="tab-envivo" aria-controls="vEnvivo" aria-selected="false" style="display:none"><span class="livedot" style="margin-right:5px">●</span>En Vivo 1</button>
+  <button class="tab tab-envivo2" data-v="envivo2" role="tab" id="tab-envivo2" aria-controls="vEnvivo2" aria-selected="false" style="display:none"><span class="livedot" style="margin-right:5px">●</span>En Vivo 2</button>
   <button class="tab" data-v="partidos" role="tab" id="tab-partidos" aria-controls="vPartidos" aria-selected="false">Partidos</button>
   <button class="tab" data-v="grupos" role="tab" id="tab-grupos" aria-controls="vGrupos" aria-selected="false">Grupos</button>
   <button class="tab" data-v="goleadores" role="tab" id="tab-goleadores" aria-controls="vGoleadores" aria-selected="false">Goleadores</button>
@@ -264,6 +265,7 @@ input[type="number"] {
 
 <div id="vTabla" role="tabpanel" aria-labelledby="tab-tabla" tabindex="0"></div>
 <div id="vEnvivo" role="tabpanel" aria-labelledby="tab-envivo" tabindex="0" style="display:none"></div>
+<div id="vEnvivo2" role="tabpanel" aria-labelledby="tab-envivo2" tabindex="0" style="display:none"></div>
 <div id="vPartidos" role="tabpanel" aria-labelledby="tab-partidos" tabindex="0" style="display:none"></div>
 <div id="vGrupos" role="tabpanel" aria-labelledby="tab-grupos" tabindex="0" style="display:none"></div>
 <div id="vGoleadores" role="tabpanel" aria-labelledby="tab-goleadores" tabindex="0" style="display:none"></div>
@@ -1221,7 +1223,7 @@ function renderEnvivo(sum){
         <div style="display:flex;justify-content:space-around;align-items:center;margin-bottom:12px">
           <div style="flex:1;text-align:center">
             <div style="font-weight:600;font-size:14px;margin-bottom:4px">${match.t1}</div>
-            ${flagImg(match.t1)}
+            <img src="${flagImg(match.t1)}" alt="${match.t1}" style="width:40px;height:30px;border-radius:3px">
           </div>
           <div style="text-align:center">
             <div style="font-size:28px;font-weight:700;color:var(--gold)">${sc[0]} - ${sc[1]}</div>
@@ -1229,7 +1231,7 @@ function renderEnvivo(sum){
           </div>
           <div style="flex:1;text-align:center">
             <div style="font-weight:600;font-size:14px;margin-bottom:4px">${match.t2}</div>
-            ${flagImg(match.t2)}
+            <img src="${flagImg(match.t2)}" alt="${match.t2}" style="width:40px;height:30px;border-radius:3px">
           </div>
         </div>
       </div>
@@ -1240,6 +1242,134 @@ function renderEnvivo(sum){
   el.innerHTML = tabsHtml + `<div class="lv-wrap">` + matchesHtml + `</div>`;
 }
 
+  // DEBUG: Loguear datos de eventos
+  const keyEvents = getLiveKeyEvents(sum, comp);
+  const st = comp.status || (sum.header?.status) || {};
+  const currentMin = parseInt(st.displayClock?.match(/\d+/)?.[0] || 0);
+  console.log('=== QUINIELA EN VIVO DEBUG ===');
+  console.log('⏱️ Minuto Actual:', currentMin);
+  console.log('📊 Total Eventos:', keyEvents.length);
+  keyEvents.forEach((e, i) => {
+    const txt = e.text || e.displayText || e.shortText || e.type?.text || e.type?.description || '';
+    const eventMin = parseInt(e.clock?.displayValue?.match(/\d+/)?.[0] || e.minute || 0);
+    const isFuture = eventMin > currentMin;
+    console.log(`[${i}] Min: ${eventMin || '?'} | Futuro: ${isFuture ? '⚠️ SÍ' : '✓'} | ${txt.substring(0, 60)}`);
+  });
+  console.log('==============================');
+
+  // Extraer competidores (home/away) con fallback seguro
+  const cs=comp.competitors||[];
+  const home=cs.find(c=>c.homeAway==='home')||cs[0]||{};
+  const away=cs.find(c=>c.homeAway==='away')||cs[1]||{};
+  const hName=(home.team?.displayName||home.team?.name)||'';
+  const aName=(away.team?.displayName||away.team?.name)||'';
+  
+  // Logos con fallback a flagcdn
+  let hLogo=(home.team?.logos?.[0]?.href)||(home.team?.logo)||'';
+  let aLogo=(away.team?.logos?.[0]?.href)||(away.team?.logo)||'';
+  if(!hLogo) hLogo=lvFlag(hName);
+  if(!aLogo) aLogo=lvFlag(aName);
+  
+  // Marcador
+  const hScore=home.score!=null?home.score:'0';
+  const aScore=away.score!=null?away.score:'0';
+  
+  // Estado del partido y cálculo de breaks (Muestreo Estratégico)
+  const stType=st.type||{};
+  const isFinal=stType.completed===true||stType.state==='post';
+  const clockTxt=isFinal?'Final':(
+    stType.detail && /halftime|half time|end of first half/i.test(stType.detail) ? 'Descanso' :
+    stType.detail && /break|delay/i.test(stType.detail) ? 'Pausa' :
+    stType.shortDetail && /ht|half/i.test(stType.shortDetail) ? 'Descanso' :
+    st.displayClock || 'En juego'
+  );
+
+  const detail = String(stType.detail || '').toLowerCase();
+  const shortDetail = String(stType.shortDetail || '').toLowerCase();
+  
+  // isBreak: Hydration breaks, medio tiempo, y final (para mostrar Reporte Oficial)
+  //const isBreak=isFinal||((currentMin>=2&currentMin<=28)||(currentMin>=44&currentMin<=46)||(currentMin>=67&currentMin<=73)||(currentMin>=89));
+  
+  const isBreak =
+  isFinal ||
+  detail.includes('halftime') ||
+  detail.includes('half time') ||
+  detail.includes('end of first half') ||
+  detail.includes('break') ||
+  shortDetail === 'ht' ||
+  shortDetail.includes('half') ||
+  ((currentMin >= 24 && currentMin <= 28) ||
+   (currentMin >= 44 && currentMin <= 46) ||
+   (currentMin >= 67 && currentMin <= 73));
+  
+  // Construir HTML
+  let h=`<div class="lv-wrap"><div class="lv-status" id="lv-status"></div>`;
+  h+=`<div class="lv-card">`;
+  
+  // SCOREBOARD (encabeza la columna izquierda, junto a las estadísticas)
+  const colScoreboard=`<div class="lv-scoreboard">
+        <div class="lv-tm">${hLogo?`<img src="${hLogo}" alt="">`:''}<div class="lv-tm-name">${hName}</div></div>
+        <div class="lv-mid"><div class="lv-score">${hScore} - ${aScore}</div>
+          <div class="lv-clock ${isFinal?'ft':''}">${isFinal?'':'<span class="livedot">●</span> '}${clockTxt}</div></div>
+        <div class="lv-tm">${aLogo?`<img src="${aLogo}" alt="">`:''}<div class="lv-tm-name">${aName}</div></div>
+      </div>`;
+
+  // ===== JUGADAS CLAVE (siempre que existan; va en columna izquierda) =====
+  let colEventos='';
+  {
+    const keyEvents = getLiveKeyEvents(sum, comp);
+    
+if(keyEvents.length){
+      colEventos+=`<div class="lv-section"><h4>Jugadas Clave</h4>`;
+      keyEvents.forEach(k=>{
+
+        const txt = (
+          k.text ||
+          k.displayText ||
+          k.shortText ||
+          k.type?.text ||
+          k.type?.description ||
+          ''
+        ).toLowerCase();
+
+        const typeId = (
+          k.type?.id ||
+          k.type?.name ||
+          ''
+        );
+        
+        // Iconografía robusta (covers ESPN naming variations)
+        //let ico='•';
+        //if(/goal|gol/.test(txt)||/goal/i.test(typeId)){ ico='⚽'; }
+        //else if(/substitution|cambio|sub/.test(txt)||/substitution/i.test(typeId)){ ico='🔄'; }
+        //else if(/yellow|amarilla/.test(txt)||/yellow/i.test(typeId)){ ico='🟨'; }
+        //else if(/red|roja/.test(txt)||/red/i.test(typeId)){ ico='🟥'; }
+        //else if(/penalty|penal/.test(txt)){ ico='🎯'; }
+
+        // Iconografía y traducción de tipos de evento al español
+        let ico='•', esTipo='';
+        if(/goal|gol/.test(txt)||/goal/i.test(typeId)){ ico='⚽'; esTipo='Gol'; }
+        else if(/substitution|cambio|sub/.test(txt)||/substitution/i.test(typeId)){ ico='🔄'; esTipo='Sustitución'; }
+        else if(/yellow|amarilla/.test(txt)||/yellow/i.test(typeId)){ ico='🟨'; esTipo='Tarjeta amarilla'; }
+        else if(/red|roja/.test(txt)||/red/i.test(typeId)){ ico='🟥'; esTipo='Tarjeta roja'; }
+        else if(/penalty|penal/.test(txt)){ ico='🎯'; esTipo='Penal'; }
+        else if(/kickoff|start of|kick off/i.test(txt)){ ico='📯'; esTipo='Inicio'; }
+        else if(/halftime|half time|half-time|descanso/i.test(txt)){ ico='📯'; esTipo='Descanso'; }
+        else if(/second half|segundo tiempo|start of second/i.test(txt)){ ico='📯'; esTipo='Segundo tiempo'; }
+        else if(/full time|final|end of match/i.test(txt)){ ico='📯'; esTipo='Final'; }
+                
+        const min =
+          k.clock?.displayValue ||
+          k.time?.displayValue ||
+          k.time ||
+          k.minute ||
+          '';
+        
+        const player =
+          k.participants?.[0]?.athlete?.displayName ||
+          k.athlete?.displayName ||
+          k.text ||
+          k.displayText ||
           k.shortText ||
           '';
         
@@ -1402,7 +1532,39 @@ async function refreshEnvivo(){
   }
 }
 
-// ========== checkEnvivo: Detección Inteligente con Persistencia Post-Final ==========
+function renderEnvivoSimple(match, containerId){
+  const el = document.getElementById(containerId);
+  if(!el || !match) return;
+  
+  const sc = LIVE[match.id] || [0, 0];
+  const minTxt = MINUTOS[match.id] ? `${MINUTOS[match.id]}'` : '...';
+  
+  let html = `
+    <div style="text-align:center;padding:20px">
+      <div style="display:flex;justify-content:space-around;align-items:center;margin-bottom:20px">
+        <div style="flex:1;text-align:center">
+          <div style="font-weight:600;font-size:14px;margin-bottom:8px">${match.t1}</div>
+          ${flagImg(match.t1)}
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:36px;font-weight:700;color:var(--gold);margin:0 12px">${sc[0]} - ${sc[1]}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px">${minTxt}</div>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div style="font-weight:600;font-size:14px;margin-bottom:8px">${match.t2}</div>
+          ${flagImg(match.t2)}
+        </div>
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,.5);padding:12px;background:rgba(99,190,123,.08);border-radius:6px">
+        ${match.group ? `Grupo ${match.group}` : ''}
+      </div>
+    </div>
+  `;
+  
+  el.innerHTML = html;
+}
+
+// ========== checkEnvivo: Detección de múltiples partidos EN VIVO ==========
 // Comprueba si hay partido en vivo y gestiona la visibilidad del tab EN VIVO.
 // Lógica:
 // - Mientras hay partido EN VIVO: tab visible, refresco cada 25s
@@ -1410,64 +1572,59 @@ async function refreshEnvivo(){
 // - Tras 10 min: tab se oculta y vuelve a Posiciones si estaba activo
 // - Si hay error ESPN: no rompe nada, tab simplemente no aparece
 async function checkEnvivo(){
-  const tabBtn=document.getElementById('tab-envivo');
+  const tabBtn1=document.getElementById('tab-envivo');
+  const tabBtn2=document.getElementById('tab-envivo2');
+  const liveMatches = DATA.matches.filter(m => LIVE[m.id]);
+  
   try{
-    const ev=await findLiveEvent();
-    
-    // ===== CASO 1: Hay evento EN VIVO (in progress) =====
-    if(ev){
-      ENVIVO_EVENT=ev.id;
+    // ===== Si hay PARTIDOS EN VIVO =====
+    if(liveMatches.length > 0){
+      ENVIVO_ACTIVE = true;
       
-      // Primera vez que detectamos el partido
-      if(!ENVIVO_ACTIVE){
-        ENVIVO_ACTIVE=true;
-        tabBtn.style.display='';
-        
-        // Limpiar timer anterior si existe
-        if(ENVIVO_TIMER) clearInterval(ENVIVO_TIMER);
-        
-        // Refresco activo mientras hay partido (cada 25s)
-        ENVIVO_TIMER=setInterval(refreshEnvivo, 25*1000);
-        
-        // Limpiar timer de post-final si existe (estamos EN VIVO, no en post)
-        if(tabBtn.dataset.postTimer){
-          clearTimeout(parseInt(tabBtn.dataset.postTimer));
-          tabBtn.dataset.postTimer='';
-        }
+      // Mostrar pestañas según cuántos en vivo haya
+      tabBtn1.style.display = '';
+      if(liveMatches.length > 1){
+        tabBtn2.style.display = '';
+      } else {
+        tabBtn2.style.display = 'none';
       }
       
-      // Refrescar detalles del partido
-      await refreshEnvivo();
+      // Limpiar timer anterior si existe
+      if(ENVIVO_TIMER) clearInterval(ENVIVO_TIMER);
       
-    // ===== CASO 2: No hay evento EN VIVO (checkEnvivo no encontró nada) =====
+      // Refresco activo (cada 25s)
+      ENVIVO_TIMER = setInterval(refreshEnvivo, 25*1000);
+      
+      // Renderizar partidos EN VIVO
+      renderEnvivoSimple(liveMatches[0], 'vEnvivo');
+      if(liveMatches.length > 1){
+        renderEnvivoSimple(liveMatches[1], 'vEnvivo2');
+      }
+      
+    // ===== NO hay PARTIDOS EN VIVO =====
     } else {
-      // Si estábamos ACTIVOS (había partido), ahora es post-final
       if(ENVIVO_ACTIVE){
-        // Parar refresco activo
-        ENVIVO_ACTIVE=false;
+        ENVIVO_ACTIVE = false;
         if(ENVIVO_TIMER){ clearInterval(ENVIVO_TIMER); ENVIVO_TIMER=null; }
         
-        // PERSISTENCIA: Mantener visible 10 minutos tras finalización
-        if(!tabBtn.dataset.postTimer){
-          tabBtn.dataset.postTimer=setTimeout(()=>{
-            // Pasados 10 min: ocultar tab
-            tabBtn.style.display='none';
-            tabBtn.dataset.postTimer='';
-            
-            // Si el usuario estaba viendo EN VIVO, volver a Posiciones
-            if(tabBtn.classList.contains('active')){
-              document.getElementById('tab-tabla').click();
-            }
-          }, 10*60*1000); // 10 minutos
-        }
-      } 
-      // Si NO estábamos activos, simplemente no mostrar tab
-      else {
-        tabBtn.style.display='none';
+        // Persistencia: mantener visible 10 min
+        setTimeout(()=>{
+          tabBtn1.style.display='none';
+          tabBtn2.style.display='none';
+          if(tabBtn1.classList.contains('active')){
+            document.getElementById('tab-tabla').click();
+          }
+        }, 10*60*1000);
+      } else {
+        tabBtn1.style.display='none';
+        tabBtn2.style.display='none';
       }
-      
       ENVIVO_EVENT=null;
     }
+  } catch(e){
+    console.error('checkEnvivo error:', e);
+  }
+}
     
   }catch(e){
     console.error('Envivo check error:',e);
