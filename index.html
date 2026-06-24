@@ -446,16 +446,15 @@ function renderTabla(){
   if(nLive>0){
     const liveMatches = DATA.matches.filter(m => LIVE[m.id]);
     if(liveMatches.length>0){
-      // Mostrar TODOS los juegos en vivo
-      const liveTexts = liveMatches.map(match => {
+      // Crear un banner separado para cada juego EN VIVO
+      liveDetail = liveMatches.map(match => {
         const sc = LIVE[match.id];
         const minTxt = MINUTOS[match.id] ? ` (${MINUTOS[match.id]}')` : '';
-        return `<strong>${match.t1} ${sc[0]} - ${sc[1]} ${match.t2}</strong>${minTxt}`;
-      });
-      liveDetail = ` · ⚽ ` + liveTexts.join(' · ⚽ ');
+        return `<div class="livebanner"><span class="livedot">●</span> EN VIVO · ⚽ <strong>${match.t1} ${sc[0]} - ${sc[1]} ${match.t2}</strong>${minTxt}</div>`;
+      }).join('');
     }
   }
-  let h = nLive>0 ? `<div class="livebanner"><span class="livedot">●</span> EN VIVO${liveDetail}</div>` : '';
+  let h = nLive>0 ? liveDetail : '';
   
   // PRÓXIMOS PARTIDOS + SIMULADOR (INTEGRADOS EN UN PANEL)
   // Detectar el formato de fecha del Google Sheets
