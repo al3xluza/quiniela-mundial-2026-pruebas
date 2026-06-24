@@ -1508,6 +1508,7 @@ async function checkEnvivo(){
       if(!ENVIVO_ACTIVE){
         ENVIVO_ACTIVE=true;
         tabBtn.style.display='';
+        tabBtn.click(); // Auto-switch a EN VIVO cuando aparezca
         
         // Limpiar timer anterior si existe
         if(ENVIVO_TIMER) clearInterval(ENVIVO_TIMER);
@@ -1576,6 +1577,8 @@ async function checkEnvivo2(){
       if(!ENVIVO2_ACTIVE){
         ENVIVO2_ACTIVE=true;
         tabBtn.style.display='';
+        // NO hacer auto-click en EN VIVO 2, dejar que usuario haga click manualmente
+        // (para no interrumpir si está viendo EN VIVO 1)
         
         // Limpiar timer anterior si existe
         if(ENVIVO2_TIMER) clearInterval(ENVIVO2_TIMER);
