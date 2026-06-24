@@ -1024,6 +1024,7 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   localStorage.setItem('activeTab', t.dataset.v);
   document.getElementById('vTabla').style.display = t.dataset.v==='tabla'?'block':'none';
   document.getElementById('vEnvivo').style.display = t.dataset.v==='envivo'?'block':'none';
+  document.getElementById('vEnvivo2').style.display = t.dataset.v==='envivo2'?'block':'none';
   document.getElementById('vPartidos').style.display = t.dataset.v==='partidos'?'block':'none';
   document.getElementById('vGrupos').style.display = t.dataset.v==='grupos'?'block':'none';
   document.getElementById('vGoleadores').style.display = t.dataset.v==='goleadores'?'block':'none';
