@@ -351,6 +351,19 @@ function simulateResult(matchId, g1, g2){
   renderTabla();
 }
 
+function showLiveMatch(idx){
+  // Ocultar todos los partidos EN VIVO
+  document.querySelectorAll('.live-match-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.live-match-tab').forEach(el => el.style.borderBottom = 'none');
+  
+  // Mostrar el seleccionado
+  const selected = document.querySelector(`.live-match-content[data-idx="${idx}"]`);
+  if(selected) selected.style.display = 'block';
+  
+  const tab = document.querySelector(`.live-match-tab[data-idx="${idx}"]`);
+  if(tab) tab.style.borderBottom = '2px solid var(--gold)';
+}
+
 function toggleSimulationPanel(){
   const panel = document.getElementById('simulationPanel');
   const btn = document.getElementById('toggleSimulation');
@@ -444,13 +457,16 @@ function renderTabla(){
   if(nLive>0){
     const liveMatches = DATA.matches.filter(m => LIVE[m.id]);
     if(liveMatches.length>0){
-      const match = liveMatches[0];
-      const sc = LIVE[match.id];
-      const minTxt = MINUTOS[match.id] ? ` (${MINUTOS[match.id]}')` : '';
-      liveDetail = ` · ⚽ <strong>${match.t1} ${sc[0]} - ${sc[1]} ${match.t2}</strong>${minTxt}`;
+      // Mostrar TODOS los partidos EN VIVO, no solo el primero
+      const liveScores = liveMatches.map(match => {
+        const sc = LIVE[match.id];
+        const minTxt = MINUTOS[match.id] ? ` (${MINUTOS[match.id]}')` : '';
+        return `${match.t1} ${sc[0]} - ${sc[1]} ${match.t2}${minTxt}`;
+      }).join(' · ');
+      liveDetail = ` · ⚽ <strong>${liveScores}</strong>`;
     }
   }
-  let h = nLive>0 ? `<div class="livebanner"><span class="livedot">●</span> EN VIVO${liveDetail}</div>` : '';
+  let h = nLive>0 ? `<div class="livebanner"><span class="livedot">●</span> EN VIVO (${nLive})${liveDetail}</div>` : '';
   
   // PRÓXIMOS PARTIDOS + SIMULADOR (INTEGRADOS EN UN PANEL)
   // Detectar el formato de fecha del Google Sheets
@@ -478,11 +494,15 @@ function renderTabla(){
       <div style="color:rgba(255,255,255,.7);margin-bottom:12px;font-weight:600">Próximos partidos de hoy - Ingresa goles y simula</div>`;
     todaysMatches.forEach(m=>{
       const cur = SIMULATED_RESULTS[m.id] || LIVE[m.id] || [0,0];
-      h += `<div style="margin-bottom:14px;padding:10px;background:rgba(99,190,123,.08);border-radius:6px;border:1px solid rgba(99,190,123,.2)">
+      const isLive = LIVE[m.id] ? true : false;
+      const liveStyle = isLive ? 'background:rgba(99,190,123,.25);border:2px solid rgba(99,190,123,.6)' : 'background:rgba(99,190,123,.08);border:1px solid rgba(99,190,123,.2)';
+      const liveBadge = isLive ? '<span style="color:#63be7b;font-weight:600;font-size:11px">● EN VIVO</span>' : '';
+      h += `<div style="margin-bottom:14px;padding:10px;${liveStyle};border-radius:6px">
         <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;font-size:12px;color:rgba(255,255,255,.8)">
           <span style="font-weight:600">${m.time}</span>
           <span style="color:rgba(255,255,255,.5)">·</span>
           <span style="flex:1">${m.t1} vs ${m.t2}</span>
+          ${liveBadge}
           <span style="color:rgba(255,255,255,.5)">${m.date}</span>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">
@@ -1166,8 +1186,59 @@ function getLiveKeyEvents(sum, comp){
 // Validaciones: Usa ?. y || [] para omitir secciones si ESPN no envía datos
 function renderEnvivo(sum){
   const el=document.getElementById('vEnvivo'); if(!el) return;
-  const comp=sum?.header?.competitions?.[0];
-  if(!comp){ el.innerHTML=`<div class="lv-wrap"><div class="lv-status" id="lv-status"></div><div class="lv-empty">No hay detalles disponibles del partido.</div></div>`; return; }
+  
+  // Obtener TODOS los partidos EN VIVO
+  const liveMatches = DATA.matches.filter(m => LIVE[m.id]);
+  if(liveMatches.length === 0){
+    el.innerHTML = `<div class="lv-wrap"><div class="lv-empty">No hay partidos en vivo en este momento.</div></div>`;
+    return;
+  }
+  
+  // Si hay múltiples partidos EN VIVO, mostrar tabs internos
+  let tabsHtml = '';
+  if(liveMatches.length > 1){
+    tabsHtml = `<div style="display:flex;gap:6px;margin-bottom:12px;border-bottom:1px solid var(--line);padding-bottom:8px">`;
+    liveMatches.forEach((match, idx) => {
+      const isActive = idx === 0 ? 'style="border-bottom:2px solid var(--gold);color:var(--gold)"' : '';
+      const score = LIVE[match.id];
+      tabsHtml += `<button onclick="showLiveMatch(${idx})" class="live-match-tab" data-idx="${idx}" ${isActive} style="background:none;border:none;color:rgba(255,255,255,.7);padding:8px 12px;cursor:pointer;font-size:12px;font-weight:500;transition:all .3s">
+        ${match.t1} ${score[0]}-${score[1]} ${match.t2}
+      </button>`;
+    });
+    tabsHtml += `</div>`;
+  }
+  
+  // Renderizar TODOS los partidos EN VIVO (cada uno en su div)
+  let matchesHtml = '';
+  liveMatches.forEach((match, idx) => {
+    const displayStyle = idx === 0 ? 'display:block' : 'display:none';
+    matchesHtml += `<div class="live-match-content" data-idx="${idx}" style="${displayStyle}">`;
+    
+    const sc = LIVE[match.id];
+    const minTxt = MINUTOS[match.id] ? `${MINUTOS[match.id]}'` : '';
+    matchesHtml += `
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-around;align-items:center;margin-bottom:12px">
+          <div style="flex:1;text-align:center">
+            <div style="font-weight:600;font-size:14px;margin-bottom:4px">${match.t1}</div>
+            <img src="${flagImg(match.t1)}" alt="${match.t1}" style="width:40px;height:30px;border-radius:3px">
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:28px;font-weight:700;color:var(--gold)">${sc[0]} - ${sc[1]}</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.6)">${minTxt}</div>
+          </div>
+          <div style="flex:1;text-align:center">
+            <div style="font-weight:600;font-size:14px;margin-bottom:4px">${match.t2}</div>
+            <img src="${flagImg(match.t2)}" alt="${match.t2}" style="width:40px;height:30px;border-radius:3px">
+          </div>
+        </div>
+      </div>
+    `;
+    matchesHtml += `</div>`;
+  });
+  
+  el.innerHTML = tabsHtml + `<div class="lv-wrap">` + matchesHtml + `</div>`;
+}
 
   // DEBUG: Loguear datos de eventos
   const keyEvents = getLiveKeyEvents(sum, comp);
