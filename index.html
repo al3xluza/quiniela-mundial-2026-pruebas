@@ -236,6 +236,23 @@ input[type="number"] {
   .lv-tm-name{font-size:12.5px}
   .lv-xi{grid-template-columns:1fr;gap:10px}
   #simulationPanel{transition:max-height .3s ease-out, opacity .3s ease-out;opacity:1}
+  .bracket-round{padding:24px 0;border-bottom:1px solid var(--line)}
+  .bracket-round:last-child{border-bottom:none}
+  .round-title{font-family:'Saira Condensed';font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:.08em;color:var(--grass);margin-bottom:16px;text-align:center}
+  .matches-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;padding:0 16px}
+  @media(max-width:600px){.matches-grid{grid-template-columns:1fr}}
+  .match-card{background:var(--board);border:1px solid var(--line);border-radius:12px;padding:14px;animation:slideInBracket .4s ease-out;display:flex;flex-direction:column;gap:8px}
+  .match-card.pending-round{opacity:.6}
+  .match-meta{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+  .team{display:flex;align-items:center;gap:8px;padding:6px 0;min-height:24px}
+  .team.qualified{color:#FFFFFF;font-weight:600}
+  .team.pending{color:rgba(255,255,255,.6);font-style:italic}
+  .team .flag{width:20px;height:20px;border-radius:50%;flex-shrink:0}
+  .team .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+  .vs{text-align:center;font-size:11px;color:rgba(255,255,255,.4);padding:2px 0}
+  .match-info{display:flex;flex-direction:column;gap:4px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);font-size:11px;color:rgba(255,255,255,.7)}
+  .info-item{display:flex;align-items:center;gap:6px}
+  @keyframes slideInBracket{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 }
 </style>
 </head>
@@ -815,151 +832,128 @@ function renderLlaves(){
   const runners = getGroupRunners();
   const thirds = getBestThirds();
   
-  const groups = ['A','B','C','D','E','F','G','H','I','J','K','L'];
-  const completedGroups = groups.filter(g=>{
-    const matches = DATA.matches.filter(m=>m.group===g);
-    return matches.length > 0 && matches.every(m=>RESULTS[m.id]);
-  }).length;
-  
   let h='';
-  h+=`<div style="padding:16px">`;
+  h+=`<div style="padding:16px 0">`;
   
-  // TÍTULO
-  h+=`<div style="font-family:'Saira Condensed';font-weight:800;font-size:20px;color:#FFFFFF;text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px">⚽ Knockouts - Bracket Visual</div>`;
+  // TITLE
+  h+=`<div style="font-family:'Saira Condensed';font-weight:800;font-size:22px;color:#FFFFFF;text-transform:uppercase;letter-spacing:.12em;margin-bottom:24px;padding:0 16px">⚽ Round of 32 Bracket</div>`;
   
-  // ESTADO
-  h+=`<div style="background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:20px">`;
-  h+=`<div style="font-size:13px;color:rgba(255,255,255,.85);line-height:2">`;
-  h+=`<div>✓ <strong style="color:#90EE90">${winners.length}/12 Campeones</strong></div>`;
-  h+=`<div>✓ <strong style="color:#FFB6C6">${runners.length}/12 Subcampeones</strong></div>`;
-  h+=`<div>✓ <strong style="color:#87CEEB">${thirds.length}/8 Terceros</strong></div>`;
-  h+=`<div style="margin-top:8px;color:rgba(255,255,255,.6)">📅 ${completedGroups}/12 grupos | ${winners.length + runners.length + thirds.length}/32 equipos</div>`;
-  h+=`</div></div>`;
-  
-  // BRACKET - DISEÑO PROFESIONAL BALANCEADO
-  h+=`<div style="overflow-x:auto;background:rgba(99,190,123,.02);border:2px solid rgba(99,190,123,.25);border-radius:12px;padding:20px;margin-bottom:20px">`;
-  h+=`<svg width="1100" height="750" style="min-width:1100px;display:block" viewBox="0 0 1100 750" xmlns="http://www.w3.org/2000/svg">`;
-  h+=`<defs><style>`;
-  h+=`.r-label{font-family:sans-serif;font-size:14px;font-weight:700;text-anchor:middle;fill:rgba(255,255,255,.9)}`;
-  h+=`.t-box{rx:6;stroke-width:1.5px;cursor:pointer;transition:all .2s}`;
-  h+=`.t-def{fill:rgba(99,190,123,.25);stroke:rgba(99,190,123,.8)}`;
-  h+=`.t-pend{fill:rgba(100,100,100,.15);stroke:rgba(150,150,150,.45)}`;
-  h+=`.t-txt{font-family:sans-serif;font-size:11px;font-weight:700;text-anchor:middle;fill:rgba(255,255,255,.95)}`;
-  h+=`.t-pend-txt{fill:rgba(255,255,255,.55)}`;
-  h+=`.conn{fill:none;stroke:rgba(99,190,123,.5);stroke-width:1.5px;stroke-linecap:round}`;
-  h+=`</style></defs>`;
-  
-  // LABELS
-  h+=`<text class="r-label" x="85" y="25">R32</text>`;
-  h+=`<text class="r-label" x="280" y="25">R16</text>`;
-  h+=`<text class="r-label" x="470" y="25">QF</text>`;
-  h+=`<text class="r-label" x="650" y="25">SF</text>`;
-  h+=`<text class="r-label" x="820" y="25">FINAL</text>`;
-  
-  // R32 DATA
-  const r32data = [];
-  for(let i=0; i<16; i++){
-    let t1=null, t2=null;
-    if(i<4){ t1=winners[i]||null; t2=runners[i]||null; }
-    else if(i<12){ t1=winners[i]||null; t2=thirds[i-4]||null; }
-    else{ t1=runners[i-4]||null; t2=runners[i-3]||null; }
-    r32data.push({t1,t2});
-  }
-  
-  // R32 - Primeros 4 matchups (mostrados completos)
-  const boxW = 130, boxH = 22;
-  let ypos = 50;
-  
-  r32data.slice(0,4).forEach((m,i)=>{
-    const y1 = ypos;
-    const y2 = ypos + boxH + 6;
-    
-    h+=`<g onclick="sendPrompt('Match ${i+1} R32')">`;
-    h+=`<rect class="t-box ${m.t1?'t-def':'t-pend'}" x="20" y="${y1}" width="${boxW}" height="${boxH}"/>`;
-    h+=`<text class="t-txt ${m.t1?'':'t-pend-txt'}" x="${20+boxW/2}" y="${y1+16}">${(m.t1||'???').substring(0,8)}</text>`;
-    h+=`<rect class="t-box ${m.t2?'t-def':'t-pend'}" x="20" y="${y2}" width="${boxW}" height="${boxH}"/>`;
-    h+=`<text class="t-txt ${m.t2?'':'t-pend-txt'}" x="${20+boxW/2}" y="${y2+16}">${(m.t2||'???').substring(0,8)}</text>`;
-    h+=`</g>`;
-    
-    // Conectores a R16 (Match 1)
-    h+=`<path class="conn" d="M ${20+boxW} ${y1+11} L 180 ${130}"/>`;
-    h+=`<path class="conn" d="M ${20+boxW} ${y2+11} L 180 ${154}"/>`;
-    
-    ypos += (boxH+6)*2 + 15;
-  });
-  
-  // Placeholder para matches 5-16
-  h+=`<text style="font-size:10px;opacity:.4;fill:rgba(255,255,255,.4)" x="85" y="380">Matches 5-16...</text>`;
-  
-  // R16 - 2 matchups mostrados
-  const r16Y1 = 130;
-  const r16Y2 = 250;
-  
-  h+=`<g onclick="sendPrompt('R16 Match 1')">`;
-  h+=`<rect class="t-box t-pend" x="180" y="${r16Y1}" width="${boxW}" height="${boxH}"/>`;
-  h+=`<text class="t-txt t-pend-txt" x="${180+boxW/2}" y="${r16Y1+16}">R32 W1</text>`;
-  h+=`<rect class="t-box t-pend" x="180" y="${r16Y1+boxH+6}" width="${boxW}" height="${boxH}"/>`;
-  h+=`<text class="t-txt t-pend-txt" x="${180+boxW/2}" y="${r16Y1+boxH+22}">R32 W2</text>`;
-  h+=`</g>`;
-  
-  h+=`<g onclick="sendPrompt('R16 Match 2')">`;
-  h+=`<rect class="t-box t-pend" x="180" y="${r16Y2}" width="${boxW}" height="${boxH}"/>`;
-  h+=`<text class="t-txt t-pend-txt" x="${180+boxW/2}" y="${r16Y2+16}">R32 W3</text>`;
-  h+=`<rect class="t-box t-pend" x="180" y="${r16Y2+boxH+6}" width="${boxW}" height="${boxH}"/>`;
-  h+=`<text class="t-txt t-pend-txt" x="${180+boxW/2}" y="${r16Y2+boxH+22}">R32 W4</text>`;
-  h+=`</g>`;
-  
-  // Conectores R16 → QF
-  h+=`<path class="conn" d="M ${180+boxW} ${r16Y1+11} L ${470-60} ${220}"/>`;
-  h+=`<path class="conn" d="M ${180+boxW} ${r16Y1+boxH+6+11} L ${470-60} ${244}"/>`;
-  h+=`<path class="conn" d="M ${180+boxW} ${r16Y2+11} L ${470-60} ${300}"/>`;
-  h+=`<path class="conn" d="M ${180+boxW} ${r16Y2+boxH+6+11} L ${470-60} ${324}"/>`;
-  
-  // QF
-  const qfY1 = 220;
-  h+=`<g onclick="sendPrompt('QF')">`;
-  h+=`<rect class="t-box t-pend" x="${470-60}" y="${qfY1}" width="${boxW}" height="${boxH}"/>`;
-  h+=`<text class="t-txt t-pend-txt" x="${470-60+boxW/2}" y="${qfY1+16}">R16 W</text>`;
-  h+=`<rect class="t-box t-pend" x="${470-60}" y="${qfY1+boxH+6}" width="${boxW}" height="${boxH}"/>`;
-  h+=`<text class="t-txt t-pend-txt" x="${470-60+boxW/2}" y="${qfY1+boxH+22}">R16 W</text>`;
-  h+=`</g>`;
-  
-  // QF → SF
-  h+=`<path class="conn" d="M ${470-60+boxW} ${qfY1+11} L ${650-60} ${280}"/>`;
-  h+=`<path class="conn" d="M ${470-60+boxW} ${qfY1+boxH+6+11} L ${650-60} ${310}"/>`;
-  
-  // SF
-  const sfY = 280;
-  h+=`<g onclick="sendPrompt('SF')">`;
-  h+=`<rect class="t-box t-pend" x="${650-60}" y="${sfY}" width="${boxW}" height="${boxH}"/>`;
-  h+=`<text class="t-txt t-pend-txt" x="${650-60+boxW/2}" y="${sfY+16}">QF W</text>`;
-  h+=`<rect class="t-box t-pend" x="${650-60}" y="${sfY+boxH+6}" width="${boxW}" height="${boxH}"/>`;
-  h+=`<text class="t-txt t-pend-txt" x="${650-60+boxW/2}" y="${sfY+boxH+22}">QF W</text>`;
-  h+=`</g>`;
-  
-  // SF → FINAL
-  h+=`<path class="conn" d="M ${650-60+boxW} ${sfY+11} L ${820-80} ${310}"/>`;
-  h+=`<path class="conn" d="M ${650-60+boxW} ${sfY+boxH+6+11} L ${820-80} ${340}"/>`;
-  
-  // FINAL
-  const finalY = 310;
-  h+=`<g onclick="sendPrompt('FINAL')">`;
-  h+=`<rect class="t-box t-def" x="${820-80}" y="${finalY}" width="${boxW}" height="${boxH}" style="fill:rgba(255,200,0,.2);stroke:rgba(255,200,0,.7)"/>`;
-  h+=`<text class="t-txt" style="fill:rgba(255,200,0,.9)" x="${820-80+boxW/2}" y="${finalY+16}">SF W1</text>`;
-  h+=`<rect class="t-box t-def" x="${820-80}" y="${finalY+boxH+6}" width="${boxW}" height="${boxH}" style="fill:rgba(255,200,0,.2);stroke:rgba(255,200,0,.7)"/>`;
-  h+=`<text class="t-txt" style="fill:rgba(255,200,0,.9)" x="${820-80+boxW/2}" y="${finalY+boxH+22}">SF W2</text>`;
-  h+=`</g>`;
-  
-  // TROPHY
-  h+=`<text style="font-size:50px;text-anchor:middle;fill:rgba(255,200,0,.8)" x="950" y="360">🏆</text>`;
-  h+=`<text style="font-size:12px;font-weight:700;text-anchor:middle;fill:rgba(255,255,255,.7)" x="950" y="390">CAMPEÓN</text>`;
-  
-  h+=`</svg>`;
+  // STATUS
+  h+=`<div style="background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0 16px 24px;font-size:13px;color:rgba(255,255,255,.8);line-height:1.6">`;
+  h+=`<div>✓ <strong style="color:var(--grass)">${winners.length}/12 Group Winners</strong></div>`;
+  h+=`<div>✓ <strong style="color:rgba(255,182,193,.8)">${runners.length}/12 Runners-up</strong></div>`;
+  h+=`<div>✓ <strong style="color:rgba(135,206,235,.8)">${thirds.length}/8 Third-place</strong></div>`;
+  h+=`<div style="margin-top:8px;color:rgba(255,255,255,.6)"><strong>${winners.length + runners.length + thirds.length}/32</strong> teams qualified</div>`;
   h+=`</div>`;
   
-  // TIPS
-  h+=`<div style="background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:11px;color:rgba(255,255,255,.6)">`;
-  h+=`💡 <strong>Diseño:</strong> Bracket responsive con líneas alineadas | <strong style="color:#90EE90">Verde</strong> = Clasificado | <strong>Gris</strong> = Pendiente`;
+  // BRACKET - R32
+  h+=`<div class="bracket-round">`;
+  h+=`<div class="round-title" style="padding:0 16px">Round of 32</div>`;
+  const r32matches = [];
+  for(let i=0; i<16; i++){
+    let t1=null, t2=null, t1label=null, t2label=null;
+    if(i<4){ 
+      t1=winners[i]; t1label=t1||`Winner Group ${String.fromCharCode(65+i)}`; 
+      t2=runners[i]; t2label=t2||`Runner Group ${String.fromCharCode(65+i)}`;
+    } else if(i<12){ 
+      t1=winners[i]; t1label=t1||`Winner Group ${String.fromCharCode(65+i)}`;
+      t2=thirds[i-4]; t2label=t2||`3rd Place Group ${String.fromCharCode(65+i+4)}`;
+    } else { 
+      t1=runners[i-4]; t1label=t1||`Runner Group ${String.fromCharCode(65+i-4)}`;
+      t2=runners[i-3]; t2label=t2||`Runner Group ${String.fromCharCode(65+i-3)}`;
+    }
+    // Get match details from PARTIDOS tab
+    const matchKey = `R32_M${i+1}`;
+    const matchData = DATA.matches.find(m=>m.id===matchKey) || {};
+    r32matches.push({t1, t1label, t2, t2label, matchData, idx:i+1});
+  }
+  
+  h+=`<div class="matches-grid">`;
+  r32matches.forEach(m=>{
+    const date = m.matchData.fecha||'—';
+    const time = m.matchData.hora||'—';
+    const stad = m.matchData.estadio||'—';
+    h+=`<article class="match-card">`;
+    h+=`<div class="match-meta">Match ${m.idx} of 16</div>`;
+    h+=`<div class="team ${m.t1?'qualified':'pending'}">`;
+    if(m.t1) h+=`${flagImg(m.t1)}`;
+    h+=`<span class="name">${m.t1label}</span>`;
+    h+=`</div>`;
+    h+=`<div class="vs">vs</div>`;
+    h+=`<div class="team ${m.t2?'qualified':'pending'}">`;
+    if(m.t2) h+=`${flagImg(m.t2)}`;
+    h+=`<span class="name">${m.t2label}</span>`;
+    h+=`</div>`;
+    h+=`<div class="match-info">`;
+    h+=`<span class="info-item">📅 ${date}</span>`;
+    h+=`<span class="info-item">🕐 ${time}</span>`;
+    h+=`<span class="info-item">🏟️ ${stad}</span>`;
+    h+=`</div>`;
+    h+=`</article>`;
+  });
+  h+=`</div>`;
+  h+=`</div>`;
+  
+  // R16 - Placeholder
+  h+=`<div class="bracket-round">`;
+  h+=`<div class="round-title" style="padding:0 16px">Round of 16</div>`;
+  h+=`<div class="matches-grid">`;
+  for(let i=0; i<8; i++){
+    h+=`<article class="match-card pending-round">`;
+    h+=`<div class="match-meta">Match ${i+1} of 8</div>`;
+    h+=`<div class="team pending"><span class="name">R32 Winner ${(i*2+1)}</span></div>`;
+    h+=`<div class="vs">vs</div>`;
+    h+=`<div class="team pending"><span class="name">R32 Winner ${(i*2+2)}</span></div>`;
+    h+=`<div class="match-info"><span class="info-item">TBD</span></div>`;
+    h+=`</article>`;
+  }
+  h+=`</div>`;
+  h+=`</div>`;
+  
+  // QF - Placeholder
+  h+=`<div class="bracket-round">`;
+  h+=`<div class="round-title" style="padding:0 16px">Quarterfinals</div>`;
+  h+=`<div class="matches-grid">`;
+  for(let i=0; i<4; i++){
+    h+=`<article class="match-card pending-round">`;
+    h+=`<div class="match-meta">Match ${i+1} of 4</div>`;
+    h+=`<div class="team pending"><span class="name">R16 Winner ${(i*2+1)}</span></div>`;
+    h+=`<div class="vs">vs</div>`;
+    h+=`<div class="team pending"><span class="name">R16 Winner ${(i*2+2)}</span></div>`;
+    h+=`<div class="match-info"><span class="info-item">TBD</span></div>`;
+    h+=`</article>`;
+  }
+  h+=`</div>`;
+  h+=`</div>`;
+  
+  // SF - Placeholder
+  h+=`<div class="bracket-round">`;
+  h+=`<div class="round-title" style="padding:0 16px">Semifinals</div>`;
+  h+=`<div class="matches-grid">`;
+  for(let i=0; i<2; i++){
+    h+=`<article class="match-card pending-round">`;
+    h+=`<div class="match-meta">Match ${i+1} of 2</div>`;
+    h+=`<div class="team pending"><span class="name">QF Winner ${(i*2+1)}</span></div>`;
+    h+=`<div class="vs">vs</div>`;
+    h+=`<div class="team pending"><span class="name">QF Winner ${(i*2+2)}</span></div>`;
+    h+=`<div class="match-info"><span class="info-item">TBD</span></div>`;
+    h+=`</article>`;
+  }
+  h+=`</div>`;
+  h+=`</div>`;
+  
+  // FINAL
+  h+=`<div class="bracket-round">`;
+  h+=`<div class="round-title" style="padding:0 16px">🏆 Final</div>`;
+  h+=`<div class="matches-grid">`;
+  h+=`<article class="match-card pending-round">`;
+  h+=`<div class="match-meta">Championship Match</div>`;
+  h+=`<div class="team pending"><span class="name">SF Winner 1</span></div>`;
+  h+=`<div class="vs">vs</div>`;
+  h+=`<div class="team pending"><span class="name">SF Winner 2</span></div>`;
+  h+=`<div class="match-info"><span class="info-item">TBD</span></div>`;
+  h+=`</article>`;
+  h+=`</div>`;
   h+=`</div>`;
   
   h+=`</div>`;
