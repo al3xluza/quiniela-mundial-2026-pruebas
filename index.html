@@ -711,12 +711,17 @@ function renderTarjetas(){
 function getGroupWinners(){
   // Retorna los 12 campeones de grupo (en orden A-L)
   const groups = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+  const groupTeams = {};
+  
+  // Extraer equipos de DATA.matches, no de DATA.participants
+  DATA.matches.forEach(m => {
+    if(!groupTeams[m.group]) groupTeams[m.group] = new Set();
+    groupTeams[m.group].add(m.t1);
+    groupTeams[m.group].add(m.t2);
+  });
+  
   return groups.map(g => {
-    const teams = DATA.participants.filter(t => {
-      const match = DATA.matches.find(m => (m.t1===t || m.t2===t) && m.group===g);
-      return match;
-    });
-    // Calcular standing del grupo para cada team
+    const teams = Array.from(groupTeams[g]||[]);
     let standings = [];
     teams.forEach(t => {
       let p=0,gf=0,ga=0;
@@ -739,11 +744,16 @@ function getGroupWinners(){
 function getGroupRunners(){
   // Retorna los 12 subcampeones de grupo
   const groups = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+  const groupTeams = {};
+  
+  DATA.matches.forEach(m => {
+    if(!groupTeams[m.group]) groupTeams[m.group] = new Set();
+    groupTeams[m.group].add(m.t1);
+    groupTeams[m.group].add(m.t2);
+  });
+  
   return groups.map(g => {
-    const teams = DATA.participants.filter(t => {
-      const match = DATA.matches.find(m => (m.t1===t || m.t2===t) && m.group===g);
-      return match;
-    });
+    const teams = Array.from(groupTeams[g]||[]);
     let standings = [];
     teams.forEach(t => {
       let p=0,gf=0,ga=0;
@@ -766,11 +776,16 @@ function getGroupRunners(){
 function getBestThirds(){
   // Retorna los 8 mejores terceros lugares
   const groups = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+  const groupTeams = {};
+  
+  DATA.matches.forEach(m => {
+    if(!groupTeams[m.group]) groupTeams[m.group] = new Set();
+    groupTeams[m.group].add(m.t1);
+    groupTeams[m.group].add(m.t2);
+  });
+  
   const thirds = groups.map(g => {
-    const teams = DATA.participants.filter(t => {
-      const match = DATA.matches.find(m => (m.t1===t || m.t2===t) && m.group===g);
-      return match;
-    });
+    const teams = Array.from(groupTeams[g]||[]);
     let standings = [];
     teams.forEach(t => {
       let p=0,gf=0,ga=0;
@@ -818,27 +833,29 @@ function renderLlaves(){
       </div>
     </div>`;
   
-  // SVG Bracket
-  h+=`<svg width="100%" viewBox="0 0 1200 750" style="background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;box-sizing:border-box" xmlns="http://www.w3.org/2000/svg">
+  // SVG Bracket - VERSIÓN MUY GRANDE Y LEGIBLE
+  h+=`<div style="overflow-x:auto;background:rgba(99,190,123,.02);border:2px solid rgba(99,190,123,.25);border-radius:12px;padding:24px;margin-bottom:20px">
+    <svg width="2400" height="1400" style="min-width:2400px;display:block" viewBox="0 0 2400 1400" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></marker>
       <style>
-        .r-label{font-family:sans-serif;font-size:12px;font-weight:600;text-anchor:middle;fill:rgba(255,255,255,.7)}
-        .t-box{rx:4;stroke-width:0.5px;cursor:pointer}
-        .t-def{fill:rgba(99,190,123,.15);stroke:rgba(99,190,123,.5)}
-        .t-pend{fill:rgba(100,100,100,.1);stroke:rgba(150,150,150,.3)}
-        .t-txt{font-family:sans-serif;font-size:10px;font-weight:500;text-anchor:middle;fill:rgba(255,255,255,.8)}
-        .t-pend-txt{fill:rgba(255,255,255,.4)}
-        .conn{fill:none;stroke:rgba(255,255,255,.2);stroke-width:0.5px}
+        .r-label{font-family:sans-serif;font-size:28px;font-weight:900;text-anchor:middle;fill:rgba(255,255,255,.95);letter-spacing:.08em}
+        .t-box{rx:10;stroke-width:2.5px;cursor:pointer}
+        .t-def{fill:rgba(99,190,123,.28);stroke:rgba(99,190,123,.85)}
+        .t-pend{fill:rgba(100,100,100,.18);stroke:rgba(150,150,150,.5)}
+        .t-txt{font-family:sans-serif;font-size:16px;font-weight:800;text-anchor:middle;fill:rgba(255,255,255,.97)}
+        .t-pend-txt{fill:rgba(255,255,255,.6)}
+        .conn{fill:none;stroke:rgba(255,255,255,.35);stroke-width:2px;stroke-linecap:round}
       </style>
     </defs>
-    <text class="r-label" x="80" y="30">Round of 32</text>
-    <text class="r-label" x="280" y="30">Round of 16</text>
-    <text class="r-label" x="460" y="30">Cuartos</text>
-    <text class="r-label" x="620" y="30">Semis</text>
-    <text class="r-label" x="760" y="30">Final</text>`;
+    
+    <!-- ROUND LABELS -->
+    <text class="r-label" x="220" y="60">Round of 32</text>
+    <text class="r-label" x="700" y="60">Round of 16</text>
+    <text class="r-label" x="1180" y="60">Cuartos</text>
+    <text class="r-label" x="1650" y="60">Semis</text>
+    <text class="r-label" x="2100" y="60">Final</text>`;
   
-  // R32 Matchups (16 total - mostrar primeros 4, luego placeholder)
+  // R32 Matchups
   const r32data = [];
   for(let i=0; i<16; i++){
     let t1=null, t2=null;
@@ -848,47 +865,69 @@ function renderLlaves(){
     r32data.push({t1,t2});
   }
   
-  let ypos=60;
+  let ypos=130;
+  const boxH = 50;
+  const gap = 14;
+  
   r32data.forEach((m,i)=>{
-    if(i>=4) return; // Solo mostrar primeros 4
-    h+=`<g onclick="sendPrompt('Match ${i+1} R32')">
-      <rect class="t-box ${m.t1?'t-def':'t-pend'}" x="20" y="${ypos}" width="120" height="20"/>
-      <text class="t-txt ${m.t1?'':'t-pend-txt'}" x="80" y="${ypos+14}">${m.t1||'⏳ Por definir'}</text>
-      <rect class="t-box ${m.t2?'t-def':'t-pend'}" x="20" y="${ypos+23}" width="120" height="20"/>
-      <text class="t-txt ${m.t2?'':'t-pend-txt'}" x="80" y="${ypos+37}">${m.t2||'⏳ Por definir'}</text>
+    if(i>=4) return;
+    h+=`<g onclick="sendPrompt('Match ${i+1} R32: ${m.t1} vs ${m.t2}')">
+      <rect class="t-box ${m.t1?'t-def':'t-pend'}" x="30" y="${ypos}" width="340" height="${boxH}"/>
+      <text class="t-txt ${m.t1?'':'t-pend-txt'}" x="200" y="${ypos+36}">${m.t1||'⏳ Por definir'}</text>
+      <rect class="t-box ${m.t2?'t-def':'t-pend'}" x="30" y="${ypos+boxH+gap}" width="340" height="${boxH}"/>
+      <text class="t-txt ${m.t2?'':'t-pend-txt'}" x="200" y="${ypos+boxH+gap+36}">${m.t2||'⏳ Por definir'}</text>
     </g>`;
-    h+=`<path class="conn" d="M 140 ${ypos+10} L 190 ${ypos+15}"/><path class="conn" d="M 140 ${ypos+33} L 190 ${ypos+28}"/>`;
-    ypos+=65;
+    h+=`<path class="conn" d="M 370 ${ypos+25} L 430 ${ypos+35}"/><path class="conn" d="M 370 ${ypos+boxH+gap+25} L 430 ${ypos+boxH+gap+35}"/>`;
+    ypos+=(boxH+gap)*2+20;
   });
   
-  h+=`<text class="r-label" x="80" y="${ypos+20}" style="font-size:11px;opacity:0.6">Matches 5-16...</text>`;
+  // R16 Matchups
+  h+=`<g onclick="sendPrompt('R16 Match 1')">
+    <rect class="t-box t-pend" x="430" y="160" width="360" height="${boxH}"/><text class="t-txt t-pend-txt" x="610" y="196">⏳ R32 Winner 1</text>
+    <rect class="t-box t-pend" x="430" y="${boxH+gap+160}" width="360" height="${boxH}"/><text class="t-txt t-pend-txt" x="610" y="${boxH+gap+196}">⏳ R32 Winner 2</text></g>`;
   
-  // R16 Matchups (8 total - mostrar placeholder)
-  h+=`<g><rect class="t-box t-pend" x="190" y="60" width="130" height="20"/><text class="t-txt t-pend-txt" x="255" y="74">⏳ R32 W1</text>
-    <rect class="t-box t-pend" x="190" y="83" width="130" height="20"/><text class="t-txt t-pend-txt" x="255" y="97">⏳ R32 W2</text></g>`;
+  h+=`<path class="conn" d="M 430 ${160+25} L 510 ${160+35}"/><path class="conn" d="M 430 ${boxH+gap+160+25} L 510 ${boxH+gap+160+35}"/>`;
   
-  h+=`<g><rect class="t-box t-pend" x="190" y="165" width="130" height="20"/><text class="t-txt t-pend-txt" x="255" y="179">⏳ R32 W3</text>
-    <rect class="t-box t-pend" x="190" y="188" width="130" height="20"/><text class="t-txt t-pend-txt" x="255" y="202">⏳ R32 W4</text></g>`;
+  h+=`<g onclick="sendPrompt('R16 Match 2')">
+    <rect class="t-box t-pend" x="430" y="380" width="360" height="${boxH}"/><text class="t-txt t-pend-txt" x="610" y="416">⏳ R32 Winner 3</text>
+    <rect class="t-box t-pend" x="430" y="${boxH+gap+380}" width="360" height="${boxH}"/><text class="t-txt t-pend-txt" x="610" y="${boxH+gap+416}">⏳ R32 Winner 4</text></g>`;
   
-  h+=`<text class="r-label" x="255" y="280" style="font-size:11px;opacity:0.6">R16 Matches...</text>`;
+  h+=`<path class="conn" d="M 430 ${380+25} L 510 ${380+35}"/><path class="conn" d="M 430 ${boxH+gap+380+25} L 510 ${boxH+gap+380+35}"/>`;
+  
+  h+=`<text style="font-size:16px;opacity:0.4;fill:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em" x="610" y="700">R16 Matches 3-8...</text>`;
   
   // Cuartos
-  h+=`<g><rect class="t-box t-pend" x="360" y="80" width="130" height="20"/><text class="t-txt t-pend-txt" x="425" y="94">⏳ QF W1</text>
-    <rect class="t-box t-pend" x="360" y="103" width="130" height="20"/><text class="t-txt t-pend-txt" x="425" y="117">⏳ QF W2</text></g>`;
+  h+=`<g onclick="sendPrompt('QF 1')">
+    <rect class="t-box t-pend" x="900" y="220" width="360" height="${boxH}"/><text class="t-txt t-pend-txt" x="1080" y="256">⏳ R16 Winner</text>
+    <rect class="t-box t-pend" x="900" y="${boxH+gap+220}" width="360" height="${boxH}"/><text class="t-txt t-pend-txt" x="1080" y="${boxH+gap+256}">⏳ R16 Winner</text></g>`;
+  
+  h+=`<path class="conn" d="M 900 ${220+25} L 980 ${220+35}"/><path class="conn" d="M 900 ${boxH+gap+220+25} L 980 ${boxH+gap+220+35}"/>`;
   
   // Semis
-  h+=`<g><rect class="t-box t-pend" x="520" y="85" width="130" height="20"/><text class="t-txt t-pend-txt" x="585" y="99">⏳ SF W1</text>
-    <rect class="t-box t-pend" x="520" y="108" width="130" height="20"/><text class="t-txt t-pend-txt" x="585" y="122">⏳ SF W2</text></g>`;
+  h+=`<g onclick="sendPrompt('SF 1')">
+    <rect class="t-box t-pend" x="1380" y="260" width="360" height="${boxH}"/><text class="t-txt t-pend-txt" x="1560" y="296">⏳ QF Winner</text>
+    <rect class="t-box t-pend" x="1380" y="${boxH+gap+260}" width="360" height="${boxH}"/><text class="t-txt t-pend-txt" x="1560" y="${boxH+gap+296}">⏳ QF Winner</text></g>`;
+  
+  h+=`<path class="conn" d="M 1380 ${260+25} L 1460 ${260+35}"/><path class="conn" d="M 1380 ${boxH+gap+260+25} L 1460 ${boxH+gap+260+35}"/>`;
   
   // Final
-  h+=`<g><rect class="t-box t-pend" x="680" y="90" width="110" height="20"/><text class="t-txt t-pend-txt" x="735" y="104">⏳ SF W1</text>
-    <rect class="t-box t-pend" x="680" y="113" width="110" height="20"/><text class="t-txt t-pend-txt" x="735" y="127">⏳ SF W2</text></g>`;
+  h+=`<g onclick="sendPrompt('FINAL')">
+    <rect class="t-box t-pend" x="1860" y="285" width="320" height="${boxH}"/><text class="t-txt t-pend-txt" x="2020" y="321">⏳ SF Winner</text>
+    <rect class="t-box t-pend" x="1860" y="${boxH+gap+285}" width="320" height="${boxH}"/><text class="t-txt t-pend-txt" x="2020" y="${boxH+gap+321}">⏳ SF Winner</text></g>`;
   
-  // Trophy
-  h+=`<text style="font-size:24px;text-anchor:middle;fill:rgba(255,255,255,.6)" x="735" y="170">🏆</text>
-    <text style="font-size:11px;font-weight:500;text-anchor:middle;fill:rgba(255,255,255,.5)" x="735" y="185">Campeón</text>`;
+  h+=`<path class="conn" d="M 1860 ${285+25} L 1940 ${285+35}"/><path class="conn" d="M 1860 ${boxH+gap+285+25} L 1940 ${boxH+gap+285+35}"/>`;
   
-  h+=`</svg></div>`;
+  // Trophy & Champion
+  h+=`<rect class="t-box t-def" x="2040" y="280" width="280" height="140" style="fill:rgba(255,200,0,.18);stroke:rgba(255,200,0,.65)"/><text style="font-size:80px;text-anchor:middle;fill:rgba(255,200,0,.85)" x="2180" y="370">🏆</text>
+    <text style="font-size:26px;font-weight:900;text-anchor:middle;fill:rgba(255,255,255,.9)" x="2180" y="445">CAMPEÓN</text>
+    <text style="font-size:20px;font-weight:700;text-anchor:middle;fill:rgba(255,255,255,.7)" x="2180" y="475">2026</text>`;
+  
+  h+=`</svg>
+  </div>`;
+  
+  h+=`<div style="background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:12px;color:rgba(255,255,255,.6)">
+    💡 <strong style="color:rgba(255,255,255,.8)">Pro Tip:</strong> El bracket es interactivo - haz click en cada matchup para ver detalles. Scroll horizontal para ver todas las rondas.
+  </div>
   
   el.innerHTML=h;
 }
