@@ -238,21 +238,41 @@ input[type="number"] {
   #simulationPanel{transition:max-height .3s ease-out, opacity .3s ease-out;opacity:1}
   .bracket-round{padding:24px 0;border-bottom:1px solid var(--line)}
   .bracket-round:last-child{border-bottom:none}
-  .round-title{font-family:'Saira Condensed';font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:.08em;color:var(--grass);margin-bottom:16px;text-align:center}
-  .matches-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;padding:0 16px}
-  @media(max-width:600px){.matches-grid{grid-template-columns:1fr}}
-  .match-card{background:var(--board);border:1px solid var(--line);border-radius:12px;padding:14px;animation:slideInBracket .4s ease-out;display:flex;flex-direction:column;gap:8px}
-  .match-card.pending-round{opacity:.6}
-  .match-meta{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
-  .team{display:flex;align-items:center;gap:8px;padding:6px 0;min-height:24px}
-  .team.qualified{color:#FFFFFF;font-weight:600}
-  .team.pending{color:rgba(255,255,255,.6);font-style:italic}
-  .team .flag{width:20px;height:20px;border-radius:50%;flex-shrink:0}
-  .team .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
-  .vs{text-align:center;font-size:11px;color:rgba(255,255,255,.4);padding:2px 0}
-  .match-info{display:flex;flex-direction:column;gap:4px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);font-size:11px;color:rgba(255,255,255,.7)}
-  .info-item{display:flex;align-items:center;gap:6px}
-  @keyframes slideInBracket{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .tournament-bracket{overflow-x:auto;padding:16px 0}
+  .bracket-tree{display:grid;grid-template-columns:repeat(5,minmax(200px,1fr));gap:16px;padding:0 16px;min-width:fit-content}
+  @media(max-width:1200px){.bracket-tree{grid-template-columns:repeat(5,minmax(160px,1fr));gap:12px}}
+  @media(max-width:768px){.tournament-bracket{overflow-x:auto}.bracket-tree{grid-template-columns:1fr;gap:20px;padding:0 8px}}
+  .bracket-column{display:flex;flex-direction:column;gap:8px}
+  .column-title{font-family:'Saira Condensed';font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--grass);text-align:center;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid var(--grass)}
+  .column-matches{display:flex;flex-direction:column;gap:8px;justify-content:space-between;min-height:400px}
+  .r32 .column-matches{min-height:unset;gap:4px}
+  .r16 .column-matches{min-height:500px}
+  .qf .column-matches{min-height:550px}
+  .sf .column-matches{min-height:600px}
+  .final .column-matches{min-height:650px;justify-content:center}
+  .match-slot{position:relative;flex:1;display:flex;align-items:center}
+  .r32-slot{min-height:80px}
+  .match-box{width:100%;background:var(--board);border:1px solid var(--line);border-radius:8px;overflow:hidden;animation:slideInMatch .4s ease-out}
+  .match-box.placeholder{opacity:.6}
+  .team-line{display:flex;align-items:center;gap:6px;padding:6px 8px;font-size:11px;font-weight:600;min-height:22px;color:rgba(255,255,255,.9)}
+  .team-line.pending{color:rgba(255,255,255,.5);font-weight:400;font-style:italic;opacity:.7}
+  .team-line.qualified{color:#FFFFFF}
+  .team-line img{width:16px;height:16px;border-radius:50%;flex-shrink:0}
+  .team-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .match-divider{height:1px;background:var(--line);margin:2px 0}
+  .match-details{display:flex;flex-direction:column;gap:2px;padding:4px 8px;background:rgba(99,190,123,.05);font-size:9px;color:rgba(255,255,255,.6)}
+  .detail-item{display:flex;align-items:center;gap:3px}
+  .trophy{text-align:center;font-size:32px;padding:8px 0;background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,165,0,.05));border-radius:4px}
+  .match-slot::after{content:'';position:absolute;right:-8px;top:50%;height:2px;width:8px;background:var(--grass);opacity:.3}
+  .r32-slot::after{display:none}
+  @keyframes slideInMatch{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+  @media(max-width:768px){
+    .bracket-tree{grid-template-columns:1fr;gap:20px}
+    .match-box{border-left:4px solid var(--grass)}
+    .column-title{text-align:left;margin-bottom:0;padding-bottom:0;border-bottom:none;border-left:3px solid var(--grass);padding-left:8px}
+    .column-matches{min-height:auto!important;gap:12px}
+    .match-slot::after{display:none}
+  }
 }
 </style>
 </head>
@@ -832,131 +852,147 @@ function renderLlaves(){
   const runners = getGroupRunners();
   const thirds = getBestThirds();
   
-  let h='';
-  h+=`<div style="padding:16px 0">`;
-  
-  // TITLE
-  h+=`<div style="font-family:'Saira Condensed';font-weight:800;font-size:22px;color:#FFFFFF;text-transform:uppercase;letter-spacing:.12em;margin-bottom:24px;padding:0 16px">⚽ Round of 32 Bracket</div>`;
-  
-  // STATUS
-  h+=`<div style="background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0 16px 24px;font-size:13px;color:rgba(255,255,255,.8);line-height:1.6">`;
-  h+=`<div>✓ <strong style="color:var(--grass)">${winners.length}/12 Group Winners</strong></div>`;
-  h+=`<div>✓ <strong style="color:rgba(255,182,193,.8)">${runners.length}/12 Runners-up</strong></div>`;
-  h+=`<div>✓ <strong style="color:rgba(135,206,235,.8)">${thirds.length}/8 Third-place</strong></div>`;
-  h+=`<div style="margin-top:8px;color:rgba(255,255,255,.6)"><strong>${winners.length + runners.length + thirds.length}/32</strong> teams qualified</div>`;
-  h+=`</div>`;
-  
-  // BRACKET - R32
-  h+=`<div class="bracket-round">`;
-  h+=`<div class="round-title" style="padding:0 16px">Round of 32</div>`;
+  // Build R32 matchups: 0-3 (W vs R), 4-11 (W vs 3rd), 12-15 (R vs R)
   const r32matches = [];
   for(let i=0; i<16; i++){
-    let t1=null, t2=null, t1label=null, t2label=null;
+    let t1, t1label, t2, t2label;
     if(i<4){ 
-      t1=winners[i]; t1label=t1||`Winner Group ${String.fromCharCode(65+i)}`; 
+      t1=winners[i]; t1label=t1||`Winner Group ${String.fromCharCode(65+i)}`;
       t2=runners[i]; t2label=t2||`Runner Group ${String.fromCharCode(65+i)}`;
-    } else if(i<12){ 
+    } else if(i<12){
       t1=winners[i]; t1label=t1||`Winner Group ${String.fromCharCode(65+i)}`;
       t2=thirds[i-4]; t2label=t2||`3rd Place Group ${String.fromCharCode(65+i+4)}`;
-    } else { 
+    } else {
       t1=runners[i-4]; t1label=t1||`Runner Group ${String.fromCharCode(65+i-4)}`;
       t2=runners[i-3]; t2label=t2||`Runner Group ${String.fromCharCode(65+i-3)}`;
     }
-    // Get match details from PARTIDOS tab
-    const matchKey = `R32_M${i+1}`;
-    const matchData = DATA.matches.find(m=>m.id===matchKey) || {};
-    r32matches.push({t1, t1label, t2, t2label, matchData, idx:i+1});
+    const matchData = DATA.matches.find(m=>m.id===`R32_M${i+1}`) || {};
+    r32matches.push({t1, t1label, t2, t2label, matchData, idx: i});
   }
   
-  h+=`<div class="matches-grid">`;
-  r32matches.forEach(m=>{
-    const date = m.matchData.fecha||'—';
-    const time = m.matchData.hora||'—';
-    const stad = m.matchData.estadio||'—';
-    h+=`<article class="match-card">`;
-    h+=`<div class="match-meta">Match ${m.idx} of 16</div>`;
-    h+=`<div class="team ${m.t1?'qualified':'pending'}">`;
+  let h='';
+  h+=`<div class="tournament-bracket">`;
+  
+  // TITLE + STATUS
+  h+=`<div style="padding:0 16px;margin-bottom:24px">`;
+  h+=`<div style="font-family:'Saira Condensed';font-weight:800;font-size:24px;color:#FFFFFF;text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px">⚽ Championship Bracket</div>`;
+  h+=`<div style="background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:12px;color:rgba(255,255,255,.7);line-height:1.8">`;
+  h+=`✓ <strong style="color:var(--grass)">${winners.length}/12</strong> Winners · `;
+  h+=`<strong style="color:rgba(255,182,193,.8)">${runners.length}/12</strong> Runners · `;
+  h+=`<strong style="color:rgba(135,206,235,.8)">${thirds.length}/8</strong> Third-place`;
+  h+=`</div>`;
+  h+=`</div>`;
+  
+  // BRACKET TREE
+  h+=`<div class="bracket-tree">`;
+  
+  // ====== R32 ======
+  h+=`<div class="bracket-column r32">`;
+  h+=`<div class="column-title">Round of 32</div>`;
+  h+=`<div class="column-matches">`;
+  
+  r32matches.forEach((m, idx)=>{
+    const date = m.matchData.fecha || '—';
+    const time = m.matchData.hora || '—';
+    const stad = m.matchData.estadio || '—';
+    
+    h+=`<div class="match-slot r32-slot" data-match-id="r32-${idx}">`;
+    h+=`<div class="match-box">`;
+    h+=`<div class="team-line ${m.t1?'qualified':'pending'}">`;
     if(m.t1) h+=`${flagImg(m.t1)}`;
-    h+=`<span class="name">${m.t1label}</span>`;
+    h+=`<span class="team-label">${m.t1label}</span>`;
     h+=`</div>`;
-    h+=`<div class="vs">vs</div>`;
-    h+=`<div class="team ${m.t2?'qualified':'pending'}">`;
+    h+=`<div class="match-divider"></div>`;
+    h+=`<div class="team-line ${m.t2?'qualified':'pending'}">`;
     if(m.t2) h+=`${flagImg(m.t2)}`;
-    h+=`<span class="name">${m.t2label}</span>`;
+    h+=`<span class="team-label">${m.t2label}</span>`;
     h+=`</div>`;
-    h+=`<div class="match-info">`;
-    h+=`<span class="info-item">📅 ${date}</span>`;
-    h+=`<span class="info-item">🕐 ${time}</span>`;
-    h+=`<span class="info-item">🏟️ ${stad}</span>`;
+    h+=`<div class="match-details">`;
+    h+=`<span class="detail-item">📅 ${date}</span>`;
+    h+=`<span class="detail-item">🕐 ${time}</span>`;
+    h+=`<span class="detail-item">🏟 ${stad.substring(0,12)}</span>`;
     h+=`</div>`;
-    h+=`</article>`;
+    h+=`</div>`;
+    h+=`</div>`;
   });
+  
   h+=`</div>`;
   h+=`</div>`;
   
-  // R16 - Placeholder
-  h+=`<div class="bracket-round">`;
-  h+=`<div class="round-title" style="padding:0 16px">Round of 16</div>`;
-  h+=`<div class="matches-grid">`;
+  // ====== R16 ======
+  h+=`<div class="bracket-column r16">`;
+  h+=`<div class="column-title">Round of 16</div>`;
+  h+=`<div class="column-matches">`;
+  
   for(let i=0; i<8; i++){
-    h+=`<article class="match-card pending-round">`;
-    h+=`<div class="match-meta">Match ${i+1} of 8</div>`;
-    h+=`<div class="team pending"><span class="name">R32 Winner ${(i*2+1)}</span></div>`;
-    h+=`<div class="vs">vs</div>`;
-    h+=`<div class="team pending"><span class="name">R32 Winner ${(i*2+2)}</span></div>`;
-    h+=`<div class="match-info"><span class="info-item">TBD</span></div>`;
-    h+=`</article>`;
+    h+=`<div class="match-slot r16-slot" data-r32-1="${i*2}" data-r32-2="${i*2+1}">`;
+    h+=`<div class="match-box placeholder">`;
+    h+=`<div class="team-line pending"><span class="team-label">R32 Winner</span></div>`;
+    h+=`<div class="match-divider"></div>`;
+    h+=`<div class="team-line pending"><span class="team-label">R32 Winner</span></div>`;
+    h+=`</div>`;
+    h+=`</div>`;
   }
+  
   h+=`</div>`;
   h+=`</div>`;
   
-  // QF - Placeholder
-  h+=`<div class="bracket-round">`;
-  h+=`<div class="round-title" style="padding:0 16px">Quarterfinals</div>`;
-  h+=`<div class="matches-grid">`;
+  // ====== QF ======
+  h+=`<div class="bracket-column qf">`;
+  h+=`<div class="column-title">Quarterfinals</div>`;
+  h+=`<div class="column-matches">`;
+  
   for(let i=0; i<4; i++){
-    h+=`<article class="match-card pending-round">`;
-    h+=`<div class="match-meta">Match ${i+1} of 4</div>`;
-    h+=`<div class="team pending"><span class="name">R16 Winner ${(i*2+1)}</span></div>`;
-    h+=`<div class="vs">vs</div>`;
-    h+=`<div class="team pending"><span class="name">R16 Winner ${(i*2+2)}</span></div>`;
-    h+=`<div class="match-info"><span class="info-item">TBD</span></div>`;
-    h+=`</article>`;
+    h+=`<div class="match-slot qf-slot">`;
+    h+=`<div class="match-box placeholder">`;
+    h+=`<div class="team-line pending"><span class="team-label">R16 W</span></div>`;
+    h+=`<div class="match-divider"></div>`;
+    h+=`<div class="team-line pending"><span class="team-label">R16 W</span></div>`;
+    h+=`</div>`;
+    h+=`</div>`;
   }
+  
   h+=`</div>`;
   h+=`</div>`;
   
-  // SF - Placeholder
-  h+=`<div class="bracket-round">`;
-  h+=`<div class="round-title" style="padding:0 16px">Semifinals</div>`;
-  h+=`<div class="matches-grid">`;
+  // ====== SF ======
+  h+=`<div class="bracket-column sf">`;
+  h+=`<div class="column-title">Semifinals</div>`;
+  h+=`<div class="column-matches">`;
+  
   for(let i=0; i<2; i++){
-    h+=`<article class="match-card pending-round">`;
-    h+=`<div class="match-meta">Match ${i+1} of 2</div>`;
-    h+=`<div class="team pending"><span class="name">QF Winner ${(i*2+1)}</span></div>`;
-    h+=`<div class="vs">vs</div>`;
-    h+=`<div class="team pending"><span class="name">QF Winner ${(i*2+2)}</span></div>`;
-    h+=`<div class="match-info"><span class="info-item">TBD</span></div>`;
-    h+=`</article>`;
+    h+=`<div class="match-slot sf-slot">`;
+    h+=`<div class="match-box placeholder">`;
+    h+=`<div class="team-line pending"><span class="team-label">QF W</span></div>`;
+    h+=`<div class="match-divider"></div>`;
+    h+=`<div class="team-line pending"><span class="team-label">QF W</span></div>`;
+    h+=`</div>`;
+    h+=`</div>`;
   }
+  
   h+=`</div>`;
   h+=`</div>`;
   
-  // FINAL
-  h+=`<div class="bracket-round">`;
-  h+=`<div class="round-title" style="padding:0 16px">🏆 Final</div>`;
-  h+=`<div class="matches-grid">`;
-  h+=`<article class="match-card pending-round">`;
-  h+=`<div class="match-meta">Championship Match</div>`;
-  h+=`<div class="team pending"><span class="name">SF Winner 1</span></div>`;
-  h+=`<div class="vs">vs</div>`;
-  h+=`<div class="team pending"><span class="name">SF Winner 2</span></div>`;
-  h+=`<div class="match-info"><span class="info-item">TBD</span></div>`;
-  h+=`</article>`;
+  // ====== FINAL ======
+  h+=`<div class="bracket-column final">`;
+  h+=`<div class="column-title">🏆 Final</div>`;
+  h+=`<div class="column-matches">`;
+  
+  h+=`<div class="match-slot final-slot">`;
+  h+=`<div class="match-box placeholder">`;
+  h+=`<div class="team-line pending"><span class="team-label">SF W</span></div>`;
+  h+=`<div class="match-divider"></div>`;
+  h+=`<div class="team-line pending"><span class="team-label">SF W</span></div>`;
+  h+=`<div class="trophy">🏆</div>`;
   h+=`</div>`;
   h+=`</div>`;
   
   h+=`</div>`;
+  h+=`</div>`;
+  
+  h+=`</div>`;
+  h+=`</div>`;
+  
   el.innerHTML=h;
 }
 
