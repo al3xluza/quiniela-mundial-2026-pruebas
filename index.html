@@ -801,82 +801,113 @@ function renderLlaves(){
   const thirds = getBestThirds();
   
   const groups = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+  const completedGroups = groups.filter(g=>{
+    const matches = DATA.matches.filter(m=>m.group===g);
+    return matches.length > 0 && matches.every(m=>RESULTS[m.id]);
+  }).length;
   
-  let h=`<div style="padding:12px"><div style="font-family:'Saira Condensed';font-weight:800;font-size:16px;color:#FFFFFF;text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px">⚽ Fase de Knockouts - Round of 32</div>`;
-  
-  // Tabla de clasificación por grupo
-  h+=`<div style="background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:16px;overflow-x:auto">`;
-  h+=`<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#90EE90">📊 Clasificación Actual (por Grupo)</div>`;
-  
-  groups.forEach(g=>{
-    const teams = DATA.participants.filter(t => {
-      const match = DATA.matches.find(m => (m.t1===t || m.t2===t) && m.group===g);
-      return match;
-    });
-    
-    let standings = [];
-    teams.forEach(t => {
-      let p=0,gf=0,ga=0,pj=0;
-      DATA.matches.filter(m=>m.group===g && (m.t1===t || m.t2===t)).forEach(m=>{
-        const r=RESULTS[m.id];
-        pj++;
-        if(!r) return;
-        const isHome=m.t1===t;
-        const sf=isHome?r[0]:r[1];
-        const sc=isHome?r[1]:r[0];
-        if(sf>sc)p+=3; else if(sf===sc)p+=1;
-        gf+=sf; ga+=sc;
-      });
-      standings.push({team:t, pts:p, gf, ga, gd:gf-ga, pj});
-    });
-    standings.sort((a,b)=>b.pts-a.pts || b.gd-a.gd || b.gf-a.gf);
-    
-    h+=`<div style="background:rgba(99,190,123,.1);border-left:3px solid rgba(99,190,123,.5);padding:8px;margin-bottom:8px;border-radius:4px">`;
-    h+=`<div style="font-weight:600;color:#FFD700;margin-bottom:4px;font-size:12px">GRUPO ${g}</div>`;
-    standings.slice(0,2).forEach((s,i)=>{
-      const check = i===0 ? '✓' : '→';
-      const isInWinners = winners.includes(s.team);
-      const isInRunners = runners.includes(s.team);
-      const style = isInWinners ? 'color:#90EE90' : isInRunners ? 'color:#FFB6C6' : 'color:rgba(255,255,255,.7)';
-      h+=`<div style="font-size:11px;margin:2px 0;${style}">${check} <strong>${s.team}</strong> (${s.pts}pts, ${s.pj}pj)</div>`;
-    });
-    h+=`</div>`;
-  });
-  
-  h+=`</div>`;
+  let h=`<div style="padding:12px">
+    <div style="font-family:'Saira Condensed';font-weight:800;font-size:16px;color:#FFFFFF;text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px">⚽ Knockouts - Bracket Visual</div>
+  `;
   
   // Estado de clasificación
   h+=`<div style="background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:16px">`;
-  h+=`<div style="font-size:13px;font-weight:600;margin-bottom:8px">🎫 Estado de Clasificación</div>`;
-  
-  const completedGroups = groups.filter(g=>{
-    const matches = DATA.matches.filter(m=>m.group===g);
-    return matches.every(m=>RESULTS[m.id]);
-  }).length;
-  
   h+=`<div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.8">`;
-  h+=`<div>✓ <strong style="color:#90EE90">${winners.length}/12 Campeones</strong> de grupo clasificados</div>`;
-  h+=`<div>✓ <strong style="color:#FFB6C6">${runners.length}/12 Subcampeones</strong> clasificados</div>`;
-  h+=`<div>✓ <strong style="color:#87CEEB">${thirds.length}/8 Terceros lugares</strong> (mejores de 12)</div>`;
-  h+=`<div style="margin-top:6px;color:rgba(255,255,255,.6)">📅 ${completedGroups}/12 grupos completados</div>`;
-  h+=`</div>`;
+  h+=`<div>✓ <strong style="color:#90EE90">${winners.length}/12 Campeones</strong></div>`;
+  h+=`<div>✓ <strong style="color:#FFB6C6">${runners.length}/12 Subcampeones</strong></div>`;
+  h+=`<div>✓ <strong style="color:#87CEEB">${thirds.length}/8 Terceros</strong></div>`;
+  h+=`<div style="margin-top:6px;color:rgba(255,255,255,.6)">📅 ${completedGroups}/12 grupos | ${winners.length + runners.length + thirds.length}/32 equipos clasificados</div>`;
+  h+=`</div></div>`;
   
-  h+=`</div>`;
-  
-  // Round of 32 matchups (preview)
+  // Bracket Round of 32
   if(winners.length >= 12 && runners.length >= 12 && thirds.length >= 8){
-    h+=`<div style="background:rgba(99,190,123,.1);border:1px solid rgba(99,190,123,.3);border-radius:8px;padding:12px">`;
-    h+=`<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#90EE90">⚡ Round of 32 - Estructura Completa</div>`;
-    h+=`<div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.6">`;
-    h+=`<strong>Tipo A (4 matchups):</strong> Campeones vs Subcampeones<br>`;
-    h+=`<strong>Tipo B (8 matchups):</strong> Campeones vs Terceros lugares<br>`;
-    h+=`<strong>Tipo C (4 matchups):</strong> Subcampeones vs Subcampeones`;
-    h+=`</div>`;
-    h+=`</div>`;
-  } else {
-    h+=`<div style="background:rgba(200,200,200,.1);border:1px dashed var(--line);border-radius:8px;padding:12px;font-size:12px;color:rgba(255,255,255,.6)">`;
-    h+=`⏳ Los emparejamientos exactos se definirán cuando se completen todos los grupos.`;
-    h+=`</div>`;
+    h+=`<div style="background:rgba(99,190,123,.05);border:1px solid rgba(99,190,123,.2);border-radius:8px;padding:12px;margin-bottom:16px;overflow-x:auto">`;
+    h+=`<div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#90EE90">🏆 Round of 32</div>`;
+    
+    // Generar emparejamientos simplificados
+    h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px">`;
+    
+    // 16 matchups de R32
+    const r32Matches = [];
+    for(let i = 0; i < 16; i++){
+      let t1 = null, t2 = null;
+      
+      // Estructura simplificada:
+      // 0-3: Campeones vs Subcampeones
+      if(i < 4){
+        t1 = winners[i] || null;
+        t2 = runners[i] || null;
+      }
+      // 4-11: Campeones vs Terceros
+      else if(i < 12){
+        t1 = winners[i] || null;
+        t2 = thirds[i-4] || null;
+      }
+      // 12-15: Subcampeones vs Subcampeones
+      else {
+        t1 = runners[i-4] || null;
+        t2 = runners[i-3] || null;
+      }
+      
+      r32Matches.push({t1, t2, id: i});
+      
+      const t1Result = t1 ? (RESULTS[`r32-${i}-t1`] || 0) : null;
+      const t2Result = t1 ? (RESULTS[`r32-${i}-t2`] || 0) : null;
+      
+      h+=`<div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:8px;font-size:11px;line-height:1.5">`;
+      h+=`<div style="font-weight:600;color:#FFD700;margin-bottom:4px;text-align:center">Match ${i+1}</div>`;
+      h+=`<div style="color:${t1?'#fff':'rgba(255,255,255,.4)'}; padding:4px;border-bottom:1px solid rgba(255,255,255,.1)">${t1 || '⏳ Por definir'}</div>`;
+      h+=`<div style="color:${t2?'#fff':'rgba(255,255,255,.4)'}; padding:4px">${t2 || '⏳ Por definir'}</div>`;
+      h+=`</div>`;
+    }
+    
+    h+=`</div></div>`;
+  }
+  
+  // Si aún no clasifican todos, mostrar standings por grupo
+  if(winners.length < 12 || runners.length < 12 || thirds.length < 8){
+    h+=`<div style="background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:16px">`;
+    h+=`<div style="font-size:12px;font-weight:600;margin-bottom:8px;color:#90EE90">📊 Standings por Grupo</div>`;
+    
+    const groupTeams = {};
+    DATA.matches.forEach(m => {
+      if(!groupTeams[m.group]) groupTeams[m.group] = new Set();
+      groupTeams[m.group].add(m.t1);
+      groupTeams[m.group].add(m.t2);
+    });
+    
+    h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;font-size:11px">`;
+    
+    groups.forEach(g=>{
+      const teams = Array.from(groupTeams[g]||[]);
+      
+      let standings = [];
+      teams.forEach(t => {
+        let p=0,gf=0,ga=0;
+        DATA.matches.filter(m=>m.group===g && (m.t1===t || m.t2===t)).forEach(m=>{
+          const r=RESULTS[m.id];
+          if(!r) return;
+          const isHome=m.t1===t;
+          const sf=isHome?r[0]:r[1];
+          const sc=isHome?r[1]:r[0];
+          if(sf>sc)p+=3; else if(sf===sc)p+=1;
+          gf+=sf; ga+=sc;
+        });
+        standings.push({team:t, pts:p, gf, ga});
+      });
+      standings.sort((a,b)=>b.pts-a.pts || b.gf-a.gf);
+      
+      h+=`<div style="background:rgba(99,190,123,.1);border-left:2px solid rgba(99,190,123,.5);padding:6px">`;
+      h+=`<div style="font-weight:600;color:#FFD700;margin-bottom:3px">GRUPO ${g}</div>`;
+      standings.slice(0,2).forEach((s,i)=>{
+        const check = i===0 ? '✓' : '→';
+        const color = i===0 ? '#90EE90' : '#FFB6C6';
+        h+=`<div style="color:${color};font-size:10px">${check} ${s.team} (${s.pts}p)</div>`;
+      });
+      h+=`</div>`;
+    });
+    
+    h+=`</div></div>`;
   }
   
   h+=`</div>`;
