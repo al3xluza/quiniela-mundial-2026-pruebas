@@ -806,111 +806,90 @@ function renderLlaves(){
     return matches.length > 0 && matches.every(m=>RESULTS[m.id]);
   }).length;
   
-  let h=`<div style="padding:12px">
-    <div style="font-family:'Saira Condensed';font-weight:800;font-size:16px;color:#FFFFFF;text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px">⚽ Knockouts - Bracket Visual</div>
-  `;
+  let h=`<div style="padding:12px;overflow-x:auto">
+    <div style="font-family:'Saira Condensed';font-weight:800;font-size:16px;color:#FFFFFF;text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px">⚽ Knockouts - Bracket Visual</div>
+    
+    <div style="background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:12px">
+      <div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.8">
+        <div>✓ <strong style="color:#90EE90">${winners.length}/12 Campeones</strong></div>
+        <div>✓ <strong style="color:#FFB6C6">${runners.length}/12 Subcampeones</strong></div>
+        <div>✓ <strong style="color:#87CEEB">${thirds.length}/8 Terceros</strong></div>
+        <div style="margin-top:6px;color:rgba(255,255,255,.6)">📅 ${completedGroups}/12 grupos | ${winners.length + runners.length + thirds.length}/32 equipos</div>
+      </div>
+    </div>`;
   
-  // Estado de clasificación
-  h+=`<div style="background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:16px">`;
-  h+=`<div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.8">`;
-  h+=`<div>✓ <strong style="color:#90EE90">${winners.length}/12 Campeones</strong></div>`;
-  h+=`<div>✓ <strong style="color:#FFB6C6">${runners.length}/12 Subcampeones</strong></div>`;
-  h+=`<div>✓ <strong style="color:#87CEEB">${thirds.length}/8 Terceros</strong></div>`;
-  h+=`<div style="margin-top:6px;color:rgba(255,255,255,.6)">📅 ${completedGroups}/12 grupos | ${winners.length + runners.length + thirds.length}/32 equipos clasificados</div>`;
-  h+=`</div></div>`;
+  // SVG Bracket
+  h+=`<svg width="100%" viewBox="0 0 1200 750" style="background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;box-sizing:border-box" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></marker>
+      <style>
+        .r-label{font-family:sans-serif;font-size:12px;font-weight:600;text-anchor:middle;fill:rgba(255,255,255,.7)}
+        .t-box{rx:4;stroke-width:0.5px;cursor:pointer}
+        .t-def{fill:rgba(99,190,123,.15);stroke:rgba(99,190,123,.5)}
+        .t-pend{fill:rgba(100,100,100,.1);stroke:rgba(150,150,150,.3)}
+        .t-txt{font-family:sans-serif;font-size:10px;font-weight:500;text-anchor:middle;fill:rgba(255,255,255,.8)}
+        .t-pend-txt{fill:rgba(255,255,255,.4)}
+        .conn{fill:none;stroke:rgba(255,255,255,.2);stroke-width:0.5px}
+      </style>
+    </defs>
+    <text class="r-label" x="80" y="30">Round of 32</text>
+    <text class="r-label" x="280" y="30">Round of 16</text>
+    <text class="r-label" x="460" y="30">Cuartos</text>
+    <text class="r-label" x="620" y="30">Semis</text>
+    <text class="r-label" x="760" y="30">Final</text>`;
   
-  // Bracket Round of 32
-  if(winners.length >= 12 && runners.length >= 12 && thirds.length >= 8){
-    h+=`<div style="background:rgba(99,190,123,.05);border:1px solid rgba(99,190,123,.2);border-radius:8px;padding:12px;margin-bottom:16px;overflow-x:auto">`;
-    h+=`<div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#90EE90">🏆 Round of 32</div>`;
-    
-    // Generar emparejamientos simplificados
-    h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px">`;
-    
-    // 16 matchups de R32
-    const r32Matches = [];
-    for(let i = 0; i < 16; i++){
-      let t1 = null, t2 = null;
-      
-      // Estructura simplificada:
-      // 0-3: Campeones vs Subcampeones
-      if(i < 4){
-        t1 = winners[i] || null;
-        t2 = runners[i] || null;
-      }
-      // 4-11: Campeones vs Terceros
-      else if(i < 12){
-        t1 = winners[i] || null;
-        t2 = thirds[i-4] || null;
-      }
-      // 12-15: Subcampeones vs Subcampeones
-      else {
-        t1 = runners[i-4] || null;
-        t2 = runners[i-3] || null;
-      }
-      
-      r32Matches.push({t1, t2, id: i});
-      
-      const t1Result = t1 ? (RESULTS[`r32-${i}-t1`] || 0) : null;
-      const t2Result = t1 ? (RESULTS[`r32-${i}-t2`] || 0) : null;
-      
-      h+=`<div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:8px;font-size:11px;line-height:1.5">`;
-      h+=`<div style="font-weight:600;color:#FFD700;margin-bottom:4px;text-align:center">Match ${i+1}</div>`;
-      h+=`<div style="color:${t1?'#fff':'rgba(255,255,255,.4)'}; padding:4px;border-bottom:1px solid rgba(255,255,255,.1)">${t1 || '⏳ Por definir'}</div>`;
-      h+=`<div style="color:${t2?'#fff':'rgba(255,255,255,.4)'}; padding:4px">${t2 || '⏳ Por definir'}</div>`;
-      h+=`</div>`;
-    }
-    
-    h+=`</div></div>`;
+  // R32 Matchups (16 total - mostrar primeros 4, luego placeholder)
+  const r32data = [];
+  for(let i=0; i<16; i++){
+    let t1=null, t2=null;
+    if(i<4){ t1=winners[i]||null; t2=runners[i]||null; }
+    else if(i<12){ t1=winners[i]||null; t2=thirds[i-4]||null; }
+    else{ t1=runners[i-4]||null; t2=runners[i-3]||null; }
+    r32data.push({t1,t2});
   }
   
-  // Si aún no clasifican todos, mostrar standings por grupo
-  if(winners.length < 12 || runners.length < 12 || thirds.length < 8){
-    h+=`<div style="background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:16px">`;
-    h+=`<div style="font-size:12px;font-weight:600;margin-bottom:8px;color:#90EE90">📊 Standings por Grupo</div>`;
-    
-    const groupTeams = {};
-    DATA.matches.forEach(m => {
-      if(!groupTeams[m.group]) groupTeams[m.group] = new Set();
-      groupTeams[m.group].add(m.t1);
-      groupTeams[m.group].add(m.t2);
-    });
-    
-    h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;font-size:11px">`;
-    
-    groups.forEach(g=>{
-      const teams = Array.from(groupTeams[g]||[]);
-      
-      let standings = [];
-      teams.forEach(t => {
-        let p=0,gf=0,ga=0;
-        DATA.matches.filter(m=>m.group===g && (m.t1===t || m.t2===t)).forEach(m=>{
-          const r=RESULTS[m.id];
-          if(!r) return;
-          const isHome=m.t1===t;
-          const sf=isHome?r[0]:r[1];
-          const sc=isHome?r[1]:r[0];
-          if(sf>sc)p+=3; else if(sf===sc)p+=1;
-          gf+=sf; ga+=sc;
-        });
-        standings.push({team:t, pts:p, gf, ga});
-      });
-      standings.sort((a,b)=>b.pts-a.pts || b.gf-a.gf);
-      
-      h+=`<div style="background:rgba(99,190,123,.1);border-left:2px solid rgba(99,190,123,.5);padding:6px">`;
-      h+=`<div style="font-weight:600;color:#FFD700;margin-bottom:3px">GRUPO ${g}</div>`;
-      standings.slice(0,2).forEach((s,i)=>{
-        const check = i===0 ? '✓' : '→';
-        const color = i===0 ? '#90EE90' : '#FFB6C6';
-        h+=`<div style="color:${color};font-size:10px">${check} ${s.team} (${s.pts}p)</div>`;
-      });
-      h+=`</div>`;
-    });
-    
-    h+=`</div></div>`;
-  }
+  let ypos=60;
+  r32data.forEach((m,i)=>{
+    if(i>=4) return; // Solo mostrar primeros 4
+    h+=`<g onclick="sendPrompt('Match ${i+1} R32')">
+      <rect class="t-box ${m.t1?'t-def':'t-pend'}" x="20" y="${ypos}" width="120" height="20"/>
+      <text class="t-txt ${m.t1?'':'t-pend-txt'}" x="80" y="${ypos+14}">${m.t1||'⏳ Por definir'}</text>
+      <rect class="t-box ${m.t2?'t-def':'t-pend'}" x="20" y="${ypos+23}" width="120" height="20"/>
+      <text class="t-txt ${m.t2?'':'t-pend-txt'}" x="80" y="${ypos+37}">${m.t2||'⏳ Por definir'}</text>
+    </g>`;
+    h+=`<path class="conn" d="M 140 ${ypos+10} L 190 ${ypos+15}"/><path class="conn" d="M 140 ${ypos+33} L 190 ${ypos+28}"/>`;
+    ypos+=65;
+  });
   
-  h+=`</div>`;
+  h+=`<text class="r-label" x="80" y="${ypos+20}" style="font-size:11px;opacity:0.6">Matches 5-16...</text>`;
+  
+  // R16 Matchups (8 total - mostrar placeholder)
+  h+=`<g><rect class="t-box t-pend" x="190" y="60" width="130" height="20"/><text class="t-txt t-pend-txt" x="255" y="74">⏳ R32 W1</text>
+    <rect class="t-box t-pend" x="190" y="83" width="130" height="20"/><text class="t-txt t-pend-txt" x="255" y="97">⏳ R32 W2</text></g>`;
+  
+  h+=`<g><rect class="t-box t-pend" x="190" y="165" width="130" height="20"/><text class="t-txt t-pend-txt" x="255" y="179">⏳ R32 W3</text>
+    <rect class="t-box t-pend" x="190" y="188" width="130" height="20"/><text class="t-txt t-pend-txt" x="255" y="202">⏳ R32 W4</text></g>`;
+  
+  h+=`<text class="r-label" x="255" y="280" style="font-size:11px;opacity:0.6">R16 Matches...</text>`;
+  
+  // Cuartos
+  h+=`<g><rect class="t-box t-pend" x="360" y="80" width="130" height="20"/><text class="t-txt t-pend-txt" x="425" y="94">⏳ QF W1</text>
+    <rect class="t-box t-pend" x="360" y="103" width="130" height="20"/><text class="t-txt t-pend-txt" x="425" y="117">⏳ QF W2</text></g>`;
+  
+  // Semis
+  h+=`<g><rect class="t-box t-pend" x="520" y="85" width="130" height="20"/><text class="t-txt t-pend-txt" x="585" y="99">⏳ SF W1</text>
+    <rect class="t-box t-pend" x="520" y="108" width="130" height="20"/><text class="t-txt t-pend-txt" x="585" y="122">⏳ SF W2</text></g>`;
+  
+  // Final
+  h+=`<g><rect class="t-box t-pend" x="680" y="90" width="110" height="20"/><text class="t-txt t-pend-txt" x="735" y="104">⏳ SF W1</text>
+    <rect class="t-box t-pend" x="680" y="113" width="110" height="20"/><text class="t-txt t-pend-txt" x="735" y="127">⏳ SF W2</text></g>`;
+  
+  // Trophy
+  h+=`<text style="font-size:24px;text-anchor:middle;fill:rgba(255,255,255,.6)" x="735" y="170">🏆</text>
+    <text style="font-size:11px;font-weight:500;text-anchor:middle;fill:rgba(255,255,255,.5)" x="735" y="185">Campeón</text>`;
+  
+  h+=`</svg></div>`;
+  
   el.innerHTML=h;
 }
 
