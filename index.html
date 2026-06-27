@@ -239,9 +239,9 @@ input[type="number"] {
   .bracket-round{padding:24px 0;border-bottom:1px solid var(--line)}
   .bracket-round:last-child{border-bottom:none}
   .tournament-bracket{overflow-x:auto;padding:16px 0}
-  .bracket-tree{display:grid;grid-template-columns:repeat(5,minmax(200px,1fr));gap:16px;padding:0 16px;min-width:fit-content}
-  @media(max-width:1200px){.bracket-tree{grid-template-columns:repeat(5,minmax(160px,1fr));gap:12px}}
-  @media(max-width:768px){.tournament-bracket{overflow-x:auto}.bracket-tree{grid-template-columns:1fr;gap:20px;padding:0 8px}}
+  .bracket-tree{display:grid!important;grid-template-columns:repeat(5,minmax(200px,1fr))!important;gap:16px;padding:0 16px;min-width:fit-content}
+  @media(max-width:1200px){.bracket-tree{grid-template-columns:repeat(5,minmax(160px,1fr))!important;gap:12px}}
+  @media(max-width:768px){.tournament-bracket{overflow-x:auto}.bracket-tree{display:grid!important;grid-template-columns:1fr!important;gap:20px;padding:0 8px}}
   .bracket-column{display:flex;flex-direction:column;gap:8px}
   .column-title{font-family:'Saira Condensed';font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--grass);text-align:center;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid var(--grass)}
   .column-matches{display:flex;flex-direction:column;gap:8px;justify-content:space-between;min-height:400px}
