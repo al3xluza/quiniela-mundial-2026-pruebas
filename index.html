@@ -266,6 +266,14 @@ input[type="number"] {
   .match-slot::after{content:'';position:absolute;right:-8px;top:50%;height:2px;width:8px;background:var(--grass);opacity:.3}
   .r32-slot::after{display:none}
   @keyframes slideInMatch{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.match-card-bracket{background:var(--board);border:1px solid var(--line);border-left:3px solid var(--grass);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;animation:slideInMatch .4s ease-out}
+.mrow-bracket{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.match-team-bracket{display:flex;align-items:center;gap:6px;flex:1;min-width:80px;font-size:12px;font-weight:600;color:#FFFFFF}
+.match-team-bracket.t1{justify-content:flex-start}
+.tname-bracket{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.match-team-bracket img{width:18px;height:18px;border-radius:50%;flex-shrink:0}
+.score-bracket{font-size:11px;color:rgba(255,255,255,.6);font-weight:500;padding:0 4px}
+.minfo-bracket{font-size:10px;color:rgba(255,255,255,.5);line-height:1.4}
   @media(max-width:768px){
     .bracket-tree{grid-template-columns:1fr;gap:20px}
     .match-box{border-left:4px solid var(--grass)}
@@ -866,8 +874,7 @@ function renderLlaves(){
       t1=runners[i-4]; t1label=t1||`Runner Group ${String.fromCharCode(65+i-4)}`;
       t2=runners[i-3]; t2label=t2||`Runner Group ${String.fromCharCode(65+i-3)}`;
     }
-    const matchData = DATA.matches.find(m=>m.id===`R32_M${i+1}`) || {};
-    r32matches.push({t1, t1label, t2, t2label, matchData, idx: i});
+    r32matches.push({t1, t1label, t2, t2label, idx: i});
   }
   
   let h='';
@@ -892,26 +899,20 @@ function renderLlaves(){
   h+=`<div class="column-matches">`;
   
   r32matches.forEach((m, idx)=>{
-    const date = m.matchData.fecha || '—';
-    const time = m.matchData.hora || '—';
-    const stad = m.matchData.estadio || '—';
-    
     h+=`<div class="match-slot r32-slot" data-match-id="r32-${idx}">`;
-    h+=`<div class="match-box">`;
-    h+=`<div class="team-line ${m.t1?'qualified':'pending'}">`;
+    h+=`<div class="match match-card-bracket">`;
+    h+=`<div class="mrow-bracket">`;
+    h+=`<div class="match-team-bracket t1">`;
+    h+=`<span class="tname-bracket">${m.t1label}</span>`;
     if(m.t1) h+=`${flagImg(m.t1)}`;
-    h+=`<span class="team-label">${m.t1label}</span>`;
     h+=`</div>`;
-    h+=`<div class="match-divider"></div>`;
-    h+=`<div class="team-line ${m.t2?'qualified':'pending'}">`;
+    h+=`<div class="score-bracket pending">vs</div>`;
+    h+=`<div class="match-team-bracket">`;
     if(m.t2) h+=`${flagImg(m.t2)}`;
-    h+=`<span class="team-label">${m.t2label}</span>`;
+    h+=`<span class="tname-bracket">${m.t2label}</span>`;
     h+=`</div>`;
-    h+=`<div class="match-details">`;
-    h+=`<span class="detail-item">📅 ${date}</span>`;
-    h+=`<span class="detail-item">🕐 ${time}</span>`;
-    h+=`<span class="detail-item">🏟 ${stad.substring(0,12)}</span>`;
     h+=`</div>`;
+    h+=`<div class="minfo-bracket">Round of 32 · Match ${idx+1}</div>`;
     h+=`</div>`;
     h+=`</div>`;
   });
