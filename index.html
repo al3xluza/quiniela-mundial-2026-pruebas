@@ -649,9 +649,9 @@ async function loadResults(silent){
       const g1 = c[5]&&c[5].v!=null ? Number(c[5].v) : null;
       const g2 = c[6]&&c[6].v!=null ? Number(c[6].v) : null;
       const estado = c[7]&&c[7].v!=null ? String(c[7].v).toUpperCase().trim() : '';
-      const winner = c[8]&&c[8].v!=null ? String(c[8].v).toUpperCase().trim() : '';
-      const penalty = c[9]&&c[9].v!=null ? String(c[9].v).trim() : '';
       const minuto = c[10]&&c[10].v!=null ? String(c[10].v).trim() : '';
+      const winner = c[11]&&c[11].v!=null ? String(c[11].v).toUpperCase().trim() : '';
+      const penalty = c[12]&&c[12].v!=null ? String(c[12].v).trim() : '';
       if(id!=null && Number.isInteger(g1) && Number.isInteger(g2)){
       if(estado==='FINAL') nuevo[id]=[g1,g2];
       else if(estado==='EN VIVO') vivo[id]=[g1,g2];
