@@ -285,7 +285,8 @@ let MINUTOS = {}; // {matchId: "45"} minutos del partido EN VIVO
 let GOLEADORES = []; // [{jugador, sel, goles}] desde la pestaña GOLEADORES
 let TARJETAS = [];   // [{jugador, sel, amarillas, rojas}] desde la pestaña TARJETAS
 let gruposFilterDate = null; // null = mostrar todos, sino es la fecha seleccionada (ej. "11/06")
-
+let PENALTIES = {}; // {matchId: "CANADA (4-2)"}
+  
 // Auto-detect today's date and filter to it
 function initializeFilterDate(){
   const today = new Date();
@@ -641,21 +642,28 @@ async function loadResults(silent){
       throw new Error('Sheet no tiene datos o estructura incorrecta');
     }
     
-    const nuevo={}, vivo={}, minutos={};
+    const nuevo={}, vivo={}, minutos={}, penalties={};
     (js.table.rows||[]).forEach(row=>{
       const c=row.c||[];
       const id = c[0]&&c[0].v!=null ? Number(c[0].v) : null;
       const g1 = c[5]&&c[5].v!=null ? Number(c[5].v) : null;
       const g2 = c[6]&&c[6].v!=null ? Number(c[6].v) : null;
       const estado = c[7]&&c[7].v!=null ? String(c[7].v).toUpperCase().trim() : '';
+      const winner = c[8]&&c[8].v!=null ? String(c[8].v).toUpperCase().trim() : '';
+      const penalty = c[9]&&c[9].v!=null ? String(c[9].v).trim() : '';
       const minuto = c[10]&&c[10].v!=null ? String(c[10].v).trim() : '';
       if(id!=null && Number.isInteger(g1) && Number.isInteger(g2)){
-        if(estado==='FINAL') nuevo[id]=[g1,g2];
-        else if(estado==='EN VIVO') vivo[id]=[g1,g2];
-        if(minuto) minutos[id]=minuto;
+      if(estado==='FINAL') nuevo[id]=[g1,g2];
+      else if(estado==='EN VIVO') vivo[id]=[g1,g2];
+    
+      if(minuto) minutos[id]=minuto;
+    
+      if(winner==='TIE' && penalty){
+        penalties[id]=penalty;
       }
+    }
     });
-    RESULTS=nuevo; LIVE=vivo; MINUTOS=minutos; lastUpdate=new Date();
+    RESULTS=nuevo; LIVE=vivo; MINUTOS=minutos; PENALTIES=penalties; lastUpdate=new Date();
     renderAll();
     const nLive=Object.keys(LIVE).length;
     setNote(`${Object.keys(RESULTS).length} partido(s) final(es)${nLive?` · ${nLive} en vivo ahora`:''}.`,'ok');
