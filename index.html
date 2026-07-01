@@ -558,13 +558,19 @@ function renderTabla(){
 function renderPartidos(){
   const byDate={}; const fechasSet = new Set();
   DATA.matches.forEach(m=>{ (byDate[m.date]=byDate[m.date]||[]).push(m); fechasSet.add(m.date); });
-  const fechas = Array.from(fechasSet).sort();
+
+  const fechas = Array.from(fechasSet).sort((a,b)=>{
+    const [da,ma]=a.split('/').map(Number);
+    const [db,mb]=b.split('/').map(Number);
+    return new Date(2026,ma-1,da)-new Date(2026,mb-1,db);
+  });
+  
   let h=`<div style="padding:0 4px"><div style="margin-bottom:12px"><div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Filtrar por fecha</div><div style="display:flex;flex-wrap:wrap;gap:6px">`;
   h+=`<button onclick="gruposFilterDate=null;renderPartidos()" style="background:${gruposFilterDate?'rgba(255,255,255,.1)':'var(--ok)'};color:#15321F;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.06em">Todas</button>`;
   fechas.forEach(f=>{ const isActive = gruposFilterDate===f; h+=`<button onclick="gruposFilterDate='${f}';renderPartidos()" style="background:${isActive?'var(--ok)':'rgba(255,255,255,.1)'};color:${isActive?'#15321F':'#FFFFFF'};border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer">${f}</button>`; });
   h+=`</div></div>`;
   const fechasAMostrar = gruposFilterDate ? [gruposFilterDate] : fechas;
-  fechasAMostrar.forEach(d=>{ if(!byDate[d]) return; h+=`<div class="dayhdr">${d}</div><div class="daymatches">`; byDate[d].forEach(m=>{ const r=RESULTS[m.id]; const lv=(!r && LIVE[m.id]) ? LIVE[m.id] : null; const sc=r||lv; const scls=r?'':(lv?'live':'pending'); const estTxt=r?'Final':(lv?'<span class="livetag">● EN VIVO</span>':'Por jugar'); const mst=r?'is-final':(lv?'is-live':''); const minHtml=lv && MINUTOS[m.id]?`<div class="min-txt">${MINUTOS[m.id]}'</div>`:''; const stadium=m.stadium?` · ${m.stadium}`:''; h+=`<div class="match ${mst}" id="m${m.id}"><div class="mrow" onclick="toggle(${m.id})"><div class="match-team t1"><span class="tname">${m.t1}</span>${flagImg(m.t1,'right')}</div><div class="score ${scls}">${sc?`${sc[0]} - ${sc[1]}${minHtml}`:m.time}</div><div class="match-team">${flagImg(m.t2)}<span class="tname">${m.t2}</span></div></div><div class="minfo"><span class="gtag">GRUPO ${m.group}</span><span>${estTxt} · ${m.time}${stadium} · toca para ver predicciones</span></div><div class="mexp" id="x${m.id}"></div></div>`; }); h+=`</div>`; });
+  fechasAMostrar.forEach(d=>{ if(!byDate[d]) return; h+=`<div class="dayhdr">${d}</div><div class="daymatches">`; byDate[d].forEach(m=>{ const r=RESULTS[m.id]; const lv=(!r && LIVE[m.id]) ? LIVE[m.id] : null; const sc=r||lv; const scls=r?'':(lv?'live':'pending'); const estTxt=r?'Final':(lv?'<span class="livetag">● EN VIVO</span>':'Por jugar'); const mst=r?'is-final':(lv?'is-live':''); const minHtml=lv && MINUTOS[m.id]?`<div class="min-txt">${MINUTOS[m.id]}'</div>`:''; const stadium=m.stadium?` · ${m.stadium}`:''; h+=`<div class="match ${mst}" id="m${m.id}"><div class="mrow" onclick="toggle(${m.id})"><div class="match-team t1"><span class="tname">${m.t1}</span>${flagImg(m.t1,'right')}</div><div class="score ${scls}">${sc?`${sc[0]} - ${sc[1]}${minHtml}`:m.time}</div><div class="match-team">${flagImg(m.t2)}<span class="tname">${m.t2}</span></div></div><div class="minfo"><span class="gtag">${m.group}</span><span>${estTxt} · ${m.time}${stadium} · toca para ver predicciones</span></div><div class="mexp" id="x${m.id}"></div></div>`; }); h+=`</div>`; });
   h+=`</div>`;
   document.getElementById('vPartidos').innerHTML=h;
   
