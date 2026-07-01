@@ -682,7 +682,11 @@ async function loadResults(silent){
     RESULTS=nuevo; LIVE=vivo; MINUTOS=minutos; PENALTIES=penalties; lastUpdate=new Date();
     renderAll();
     const nLive=Object.keys(LIVE).length;
-    setNote(`${Object.keys(RESULTS).length} partido(s) final(es)${nLive?` · ${nLive} en vivo ahora`:''}.`,'ok');
+    const currentIds = new Set(DATA.matches.map(m => m.id));
+    const finalActuales = Object.keys(RESULTS).filter(id => currentIds.has(Number(id))).length;
+    setNote(`${finalActuales} de ${DATA.matches.length} partido(s) final(es)${nLive?` · ${nLive} en vivo ahora`:''}.`,'ok');
+
+    
     loadGoleadores();
     loadTarjetas();
   }catch(e){
