@@ -572,9 +572,20 @@ function renderPartidos(){
   h+=`</div></div>`;
   const fechasAMostrar = gruposFilterDate ? [gruposFilterDate] : fechas;
   fechasAMostrar.forEach(d=>{ if(!byDate[d]) return; h+=`<div class="dayhdr">${d}</div><div class="daymatches">`; byDate[d].forEach(m=>{ const r=RESULTS[m.id]; const lv=(!r && LIVE[m.id]) ? LIVE[m.id] : null; const sc=r||lv; const scls=r?'':(lv?'live':'pending'); const estTxt=r?'Final':(lv?'<span class="livetag">● EN VIVO</span>':'Por jugar'); const mst=r?'is-final':(lv?'is-live':''); const minHtml=lv && MINUTOS[m.id]?`<div class="min-txt">${MINUTOS[m.id]}'</div>`:''; const stadium=m.stadium?` · ${m.stadium}`:'';
-const penTxt = PENALTIES[m.id]
-  ? `<div style="font-size:10px;color:var(--gold);text-align:center;margin-top:4px;line-height:1.15">Penales: ${PENALTIES[m.id]}</div>`
-  : '';
+                                                                                                                                        
+  const penTxt = PENALTIES[m.id]
+  ? (() => {
+      const p = PENALTIES[m.id].match(/^(.*)\s+\((.*)\)$/);
+      if (!p) return '';
+      return `
+        <div style="margin-top:4px;text-align:center;line-height:1.1;">
+          <div style="font-size:10px;">PENALES</div>
+          <div style="font-size:14px;font-weight:700;">${p[1]}</div>
+          <div style="font-size:12px;">(${p[2]})</div>
+        </div>`;
+    })()
+  : '';    
+                                                                                                                                        
 
 h+=`<div class="match ${mst}" id="m${m.id}"><div class="mrow" onclick="toggle(${m.id})"><div class="match-team t1"><span class="tname">${m.t1}</span>${flagImg(m.t1,'right')}</div><div class="score ${scls}">${sc?`${sc[0]} - ${sc[1]}${minHtml}`:m.time}${penTxt}</div><div class="match-team">${flagImg(m.t2)}<span class="tname">${m.t2}</span></div></div><div class="minfo"><span class="gtag">${m.group}</span><span>${estTxt} · ${m.time}${stadium} · toca para ver predicciones</span></div><div class="mexp" id="x${m.id}"></div></div>`; }); h+=`</div>`; });
   h+=`</div>`;
