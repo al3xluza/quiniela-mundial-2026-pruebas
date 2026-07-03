@@ -493,6 +493,15 @@ function renderTabla(){
     
     // Buscar partidos de hoy sin resultado
     todaysMatches = DATA.matches.filter(m => {
+      if(RESULTS[m.id]) return false;
+      // Mantener partidos EN VIVO aunque hayan empezado el día anterior
+      if(LIVE[m.id]) return true;
+      // Mostrar partidos del día actual
+      return m.date === dateDD_MM || m.date === dateDD_MM_YY || m.date.includes(dateDD_MM);
+    });
+
+
+      
       if(RESULTS[m.id]) return false; // Ya jugado
       return m.date === dateDD_MM || m.date === dateDD_MM_YY || m.date.includes(dateDD_MM);
     });
