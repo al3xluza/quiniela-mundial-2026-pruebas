@@ -501,14 +501,7 @@ function renderTabla(){
     });
   }
 
-      
- // Buscar partidos de hoy sin resultado
-  todaysMatches = DATA.matches.filter(m => {
-    if(RESULTS[m.id]) return false;
-    if(LIVE[m.id]) return true;
-    return m.date === dateDD_MM || m.date === dateDD_MM_YY || m.date.includes(dateDD_MM);
-});
-}
+    
   
   if(todaysMatches.length > 0) {
     h += `<button id="toggleSimulation" onclick="toggleSimulationPanel()" style="margin-bottom:12px;padding:8px 12px;background:rgba(99,190,123,.2);border:1px solid rgba(99,190,123,.4);color:#fff;border-radius:6px;font-size:12px;cursor:pointer;font-weight:500;width:100%;transition:all .3s">🎲 Simular Resultados ▶</button>
