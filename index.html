@@ -244,7 +244,7 @@ input[type="number"] {
 <header>
   <div class="kicker">Canadá · México · USA</div>
   <h1>Quiniela Mundial <span class="y">2026</span></h1>
-  <div class="sub">Segunda Fase · 24 participantes · Knockouts - Octavos</div>
+  <div class="sub">Segunda Fase · 24 participantes · Knockouts - Octavos - Cuartos - Semifinales - 3er Lugar - Final</div>
 </header>
 
 <div class="statusbar">
@@ -494,7 +494,13 @@ function ptsColor(v,vals){
 
 function renderTabla(){
   const st=standings();
-  const played=Object.keys(RESULTS).length;
+ const currentIds = new Set(DATA.matches.map(m => Number(m.id)));
+
+  const played = Object.keys(RESULTS)
+    .filter(id => currentIds.has(Number(id)))
+    .length;
+
+  
   const nLive=Object.keys(LIVE).length;
   let liveDetail = '';
   if(nLive>0){
